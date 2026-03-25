@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trigo Tales — Sabio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #ffffff;
+    --off: #f7f5f2;
+    --ink: #111010;
+    --ink-light: #555350;
+    --accent: #e85d26;
+    --accent-light: #fff0ea;
+    --border: #e8e4df;
+    --green: #2e7d32;
+    --green-light: #e8f5e9;
+    --blue: #1565c0;
+    --blue-light: #e3f2fd;
+    --card-shadow: 0 2px 24px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .xp-pill {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    border: 1px solid rgba(232,93,38,0.2);
+  }
+  .back-link {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; padding-top: 64px; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  #home { max-width: 620px; margin: 0 auto; padding: 3rem 2rem 4rem; }
+
+  .home-hero { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+  .home-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0.35rem 0.9rem;
+    border-radius: 4px;
+    margin-bottom: 1.25rem;
+  }
+  .home-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 1rem;
+  }
+  .home-hero h1 em { font-style: italic; color: var(--accent); }
+  .home-hero p {
+    color: var(--ink-light);
+    font-size: 1rem;
+    font-weight: 300;
+    max-width: 440px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.7;
+  }
+
+  .char-intro {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.5rem 1.25rem 0.5rem 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.88rem;
+  }
+  .char-emoji { font-size: 1.4rem; }
+  .char-name { font-weight: 500; color: var(--ink); }
+  .char-role { color: var(--ink-light); font-weight: 300; }
+
+  .lang-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+  .lang-btn {
+    padding: 0.4rem 1.1rem;
+    border: none;
+    background: transparent;
+    color: var(--ink-light);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .lang-btn.active { background: var(--accent); color: white; }
+
+  .map-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-light);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+
+  .level-node {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 14px;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    text-align: left;
+    width: 100%;
+  }
+  .level-node:hover:not(.locked) {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(232,93,38,0.08);
+    transform: translateX(4px);
+  }
+  .level-node.current { border-color: var(--accent); background: var(--accent-light); }
+  .level-node.locked { opacity: 0.45; cursor: not-allowed; background: var(--off); }
+
+  .node-icon { font-size: 1.75rem; min-width: 2rem; text-align: center; }
+  .node-info { flex: 1; }
+  .node-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+    color: var(--ink);
+  }
+  .node-sub { font-size: 0.8rem; color: var(--ink-light); font-weight: 300; }
+
+  .node-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-start { background: var(--accent); color: white; }
+  .badge-new { background: var(--blue-light); color: var(--blue); }
+  .badge-lock { background: var(--off); color: var(--ink-light); border: 1px solid var(--border); }
+
+  /* LEVEL 0 */
+  #level0 { max-width: 680px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  .slide-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+  .slide-back {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    cursor: pointer;
+    font-weight: 500;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.2s;
+  }
+  .slide-back:hover { color: var(--ink); }
+
+  .progress-track { display: flex; gap: 0.4rem; align-items: center; }
+  .prog-dot {
+    width: 28px; height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .prog-dot.active { background: var(--accent); }
+  .prog-dot.done { background: var(--ink); }
+
+  .slide { display: none; animation: fadeUp 0.35s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-char-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.35rem 0.9rem 0.35rem 0.6rem;
+    font-size: 0.82rem;
+    margin-bottom: 1.75rem;
+  }
+  .slide-char-tag .ce { font-size: 1.1rem; }
+  .slide-char-tag .cn { font-weight: 500; color: var(--accent); }
+  .slide-char-tag .cr { color: var(--ink-light); font-weight: 300; }
+
+  .slide-visual {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    animation: floatEmoji 3s ease-in-out infinite;
+  }
+  @keyframes floatEmoji {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .slide h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+    color: var(--ink);
+  }
+  .slide h2 em { font-style: italic; color: var(--accent); }
+
+  .slide p {
+    color: var(--ink-light);
+    line-height: 1.8;
+    font-size: 1rem;
+    font-weight: 300;
+    margin-bottom: 1.25rem;
+  }
+
+  .highlight-box {
+    background: var(--accent-light);
+    border: 1px solid rgba(232,93,38,0.2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    color: var(--ink);
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .diagram-box {
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .diagram-box svg { max-width: 220px; width: 100%; }
+
+  .slide-nav { display: flex; gap: 0.75rem; margin-top: 2rem; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 0.8rem 1.75rem;
+    border-radius: 8px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #c94d1e; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-light);
+    padding: 0.8rem 1.25rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* LEVEL QUIZ */
+  #levelScreen { max-width: 680px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  .quiz-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+  .quiz-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .quiz-sub { font-size: 0.82rem; color: var(--ink-light); margin-top: 0.2rem; }
+
+  .q-progress { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 2rem; }
+  .q-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+
+  .story-box {
+    background: var(--blue-light);
+    border: 1px solid #bbdefb;
+    border-left: 3px solid var(--blue);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+  .story-char { font-size: 1.8rem; }
+  .story-name { font-size: 0.78rem; font-weight: 500; color: var(--blue); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .story-text { font-size: 0.88rem; color: var(--ink); line-height: 1.6; font-weight: 300; }
+
+  .question-box {
+    background: var(--off);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+  }
+
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .option-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+  .option-btn.correct { background: var(--green-light); border-color: #4caf50; color: var(--green); }
+  .option-btn.wrong { background: #fce4ec; border-color: #e91e63; color: #c2185b; }
+
+  .feedback-box {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    display: none;
+    margin-top: 0.75rem;
+  }
+  .feedback-box.correct { background: var(--green-light); border: 1px solid #c8e6c9; color: var(--green); }
+  .feedback-box.wrong { background: #fce4ec; border: 1px solid #f8bbd0; color: #c2185b; }
+
+  /* XP float */
+  .xp-gain {
+    position: fixed;
+    top: 40%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+    font-weight: 900;
+    pointer-events: none;
+    z-index: 999;
+    display: none;
+    animation: xpFloat 1.5s forwards;
+  }
+  @keyframes xpFloat {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -130%) scale(1.3); }
+  }
+
+  /* COMPLETION */
+  #completionScreen { max-width: 540px; margin: 0 auto; padding: 5rem 2rem; text-align: center; }
+  .completion-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; animation: pop 0.4s ease; }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .completion-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+  }
+  .completion-title em { font-style: italic; color: var(--accent); }
+  .completion-xp {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+  .completion-msg { color: var(--ink-light); font-weight: 300; line-height: 1.7; margin-bottom: 2rem; }
+  .completion-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+  /* HINDI */
+  body.hindi .en { display: none !important; }
+  body.hindi .hi { display: inline !important; }
+  body:not(.hindi) .hi { display: none !important; }
+  body:not(.hindi) .en { display: inline !important; }
+
+  @media (max-width: 480px) {
+    .options-grid { grid-template-columns: 1fr; }
+  }
+
+  /* TEACHING SCREENS (L1, L2) */
+  .teach-screen { max-width: 680px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  /* Triangle animation */
+  .tri-canvas {
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+  .tri-canvas svg { max-width: 260px; width: 100%; }
+
+  .tri-label {
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translateY(8px);
+  }
+  .tri-label.show { opacity: 1; transform: translateY(0); }
+  .tri-side {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    transition: stroke-dashoffset 0.8s ease;
+  }
+  .tri-side.draw { stroke-dashoffset: 0; }
+
+  /* Ratio cards */
+  .ratio-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+  @media(max-width:480px){ .ratio-cards { grid-template-columns: 1fr; } }
+  .ratio-card {
+    background: var(--off);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .ratio-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .ratio-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+  .ratio-formula { font-size: 0.8rem; color: var(--ink-light); font-weight: 400; line-height: 1.5; }
+  .ratio-formula strong { color: var(--ink); font-weight: 600; }
+
+  /* Mini match game */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+  .match-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .match-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-light); }
+  .match-btn.selected { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .match-btn.matched { border-color: #4caf50; background: var(--green-light); color: var(--green); pointer-events: none; }
+  .match-btn.wrong-flash { border-color: #e91e63; background: #fce4ec; }
+
+  /* Scene illustration */
+  .scene-box {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .scene-box svg { max-width: 280px; width: 100%; }
+</style>
+</head>
+<body>
+
+<div class="xp-gain" id="xpGain">+10 XP</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Sabi<span>o</span></a>
+  <div class="nav-right">
+    <div class="xp-pill" id="xpDisplay">⭐ 0 XP</div>
+    <a href="index.html" class="back-link">← Home</a>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="home-hero">
+    <div class="home-tag">📐 Trigonometry</div>
+    <h1>Trigo <em>Tales</em></h1>
+    <p class="en">Learn trigonometry through stories, characters, and real-life situations — no boring textbooks.</p>
+    <p class="hi" style="display:none">Trigonometry seekho kahaniyon, characters aur real situations ke through — koi boring textbook nahi.</p>
+    <div>
+      <div class="char-intro">
+        <span class="char-emoji">📸</span>
+        <span class="char-name">Riya</span>
+        <span class="char-role">&nbsp;— your Level 0 guide</span>
+      </div>
+    </div>
+    <div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">English</button>
+        <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:620px; margin:0 auto; padding:0 2rem 4rem;">
+    <div class="map-label">Your Journey</div>
+
+    <div class="level-node current" onclick="goToLevel0()">
+      <div class="node-icon">📸</div>
+      <div class="node-info">
+        <div class="node-title en">Level 0 — Riya's Selfie</div>
+        <div class="node-title hi" style="display:none">Level 0 — Riya की Selfie</div>
+        <div class="node-sub en">What even is a right angle?</div>
+        <div class="node-sub hi" style="display:none">Right angle kya hota hai?</div>
+      </div>
+      <span class="node-badge badge-start">Start</span>
+    </div>
+
+    <div class="level-node" onclick="goToLevel1teach()">
+      <div class="node-icon">📐</div>
+      <div class="node-info">
+        <div class="node-title">Level 1 — The Triangle Gang</div>
+        <div class="node-sub en">Sin, Cos, Tan — who are they?</div>
+        <div class="node-sub hi" style="display:none">Sin, Cos, Tan — ये kaun hain?</div>
+      </div>
+      <span class="node-badge badge-new">New</span>
+    </div>
+
+    <div class="level-node" onclick="goToLevel2teach()">
+      <div class="node-icon">📷</div>
+      <div class="node-info">
+        <div class="node-title en">Level 2 — Zara's City</div>
+        <div class="node-title hi" style="display:none">Level 2 — Zara का City</div>
+        <div class="node-sub en">Sin & Cos in the real world</div>
+        <div class="node-sub hi" style="display:none">Sin aur Cos real duniya mein</div>
+      </div>
+      <span class="node-badge badge-new">New</span>
+    </div>
+
+    <div class="level-node locked">
+      <div class="node-icon">🏗️</div>
+      <div class="node-info">
+        <div class="node-title en">Level 3 — Zara's Building</div>
+        <div class="node-title hi" style="display:none">Level 3 — Zara की Building</div>
+        <div class="node-sub en">Heights & Distances with Tan</div>
+        <div class="node-sub hi" style="display:none">Tan se Heights aur Distances</div>
+      </div>
+      <span class="node-badge badge-lock">🔒 Locked</span>
+    </div>
+
+    <div class="level-node locked">
+      <div class="node-icon">🌊</div>
+      <div class="node-info">
+        <div class="node-title">Level 4 — Dev at Sea</div>
+        <div class="node-sub">Angles of elevation & depression</div>
+      </div>
+      <span class="node-badge badge-lock">🔒 Locked</span>
+    </div>
+
+    <div class="level-node locked">
+      <div class="node-icon">🛩️</div>
+      <div class="node-info">
+        <div class="node-title">Level 5 — Kabir's Drone</div>
+        <div class="node-sub">Real-life applications</div>
+      </div>
+      <span class="node-badge badge-lock">🔒 Locked</span>
+    </div>
+
+    <div class="level-node locked">
+      <div class="node-icon">🏆</div>
+      <div class="node-info">
+        <div class="node-title">Level 6 — The Grand Quiz</div>
+        <div class="node-sub">Prove you're a Trigo Master</div>
+      </div>
+      <span class="node-badge badge-lock">🔒 Locked</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL 0 -->
+<div class="screen" id="level0">
+  <div class="slide-topbar">
+    <button class="slide-back" onclick="showHome()">← Back to map</button>
+    <div class="progress-track" id="progTrack"></div>
+    <div style="font-size:0.8rem; color:var(--accent); font-weight:500;">Level 0</div>
+  </div>
+
+  <div class="slide active" id="s0">
+    <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span><span class="cr">&nbsp;— Level 0 Guide</span></div>
+    <span class="slide-visual">🤳</span>
+    <h2 class="en">It all started with a <em>selfie.</em></h2>
+    <h2 class="hi" style="display:none">Sab kuch ek <em>selfie</em> se shuru hua.</h2>
+    <p class="en">I was standing near the school wall trying to get the perfect angle for my photo. That's when Arjun said — "Riya, do you know the wall makes a 90° angle with the ground?"</p>
+    <p class="hi" style="display:none">Main school ki wall ke paas khadi thi, perfect angle ke liye. Tab Arjun ne kaha — "Riya, yeh wall zameen ke saath 90° ka angle banati hai!"</p>
+  </div>
+
+  <div class="slide" id="s1">
+    <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+    <span class="slide-visual">📐</span>
+    <h2 class="en">What is a <em>Right Angle?</em></h2>
+    <h2 class="hi" style="display:none"><em>Right Angle</em> kya hota hai?</h2>
+    <p class="en">A right angle is exactly 90°. It's in every corner of a room, every door, every book. It's everywhere once you start looking.</p>
+    <p class="hi" style="display:none">Right angle exactly 90° hota hai. Yeh kamre ke har kone mein, darwazon mein, kitaabon mein hota hai — jab dhundha toh har jagah milega!</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="160" x2="200" y2="160" stroke="#111010" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="50" y1="160" x2="50" y2="30" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 50 140 L 70 140 L 70 160" fill="none" stroke="#111010" stroke-width="2"/>
+        <text x="76" y="155" fill="#555350" font-size="13" font-family="DM Sans">90°</text>
+        <circle cx="50" cy="30" r="4" fill="#e85d26"/>
+        <circle cx="200" cy="160" r="4" fill="#111010"/>
+        <circle cx="50" cy="160" r="5" fill="#e85d26"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="slide" id="s2">
+    <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+    <span class="slide-visual">🏠</span>
+    <h2 class="en">Right Angles are <em>Everywhere!</em></h2>
+    <h2 class="hi" style="display:none">Right Angles <em>sabhi jagah</em> hain!</h2>
+    <p class="en">Your phone screen? Four right angles. The corner of this page? Right angle. The intersection of a road? Right angles!</p>
+    <p class="hi" style="display:none">Phone screen? Chaar right angles. Page ka kona? Right angle. Road ka intersection? Right angles!</p>
+    <div class="highlight-box">
+      <span class="en">🧠 Fun Fact: Builders use right angles to make sure walls don't lean. Without 90°, buildings would fall!</span>
+      <span class="hi" style="display:none">🧠 Fun Fact: Builders right angles use karte hain taaki walls seedhi rahein. 90° ke bina buildings gir jaayengi!</span>
+    </div>
+  </div>
+
+  <div class="slide" id="s3">
+    <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+    <span class="slide-visual">🔺</span>
+    <h2 class="en">Enter: The <em>Right Triangle</em></h2>
+    <h2 class="hi" style="display:none">Aaya: <em>Right Triangle</em></h2>
+    <p class="en">When one angle of a triangle is 90°, it becomes a right triangle — the foundation of all trigonometry!</p>
+    <p class="hi" style="display:none">Jab triangle ka ek angle 90° ho, woh ban jaata hai right triangle — poori trigonometry ki neev!</p>
+    <div class="diagram-box">
+      <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="30,175 190,175 30,40" fill="rgba(232,93,38,0.06)" stroke="#e85d26" stroke-width="2"/>
+        <path d="M 30 155 L 50 155 L 50 175" fill="none" stroke="#111010" stroke-width="2"/>
+        <text x="100" y="193" fill="#1565c0" font-size="11" font-family="DM Sans" text-anchor="middle">Base</text>
+        <text x="12" y="110" fill="#e85d26" font-size="11" font-family="DM Sans" text-anchor="middle">Height</text>
+        <text x="128" y="92" fill="#2e7d32" font-size="11" font-family="DM Sans" text-anchor="middle">Hypotenuse</text>
+        <text x="155" y="168" fill="#555350" font-size="11" font-family="DM Sans">θ</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="slide" id="s4">
+    <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+    <span class="slide-visual">🎉</span>
+    <h2 class="en">You're ready for <em>Level 1!</em></h2>
+    <h2 class="hi" style="display:none">Tum <em>Level 1</em> ke liye ready ho!</h2>
+    <p class="en">In the next level, you'll meet Sin, Cos, and Tan — the three superheroes of trigonometry!</p>
+    <p class="hi" style="display:none">Agli level mein miloge Sin, Cos aur Tan se — trigonometry ke teen superheroes!</p>
+    <div class="highlight-box">
+      <span class="en">⭐ You earned 20 XP for completing Level 0!</span>
+      <span class="hi" style="display:none">⭐ Level 0 complete karne par 20 XP mile!</span>
+    </div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="btn-ghost" id="prevBtn" onclick="prevSlide()" style="display:none">← Prev</button>
+    <button class="btn-primary" id="nextBtn" onclick="nextSlide()">Next →</button>
+  </div>
+</div>
+
+<!-- LEVEL 1 TEACHING — Final correct sequence -->
+<div class="screen" id="level1teach">
+  <div class="teach-screen">
+    <div class="slide-topbar">
+      <button class="slide-back" onclick="showHome()">← Back to map</button>
+      <div class="progress-track" id="l1progTrack"></div>
+      <div style="font-size:0.8rem; color:var(--accent); font-weight:500;">Level 1</div>
+    </div>
+
+    <!-- SLIDE 1: Observation — no terms at all -->
+    <div class="slide active" id="l1s0">
+      <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span><span class="cr">&nbsp;— Level 1 Guide</span></div>
+      <span class="slide-visual">🤳</span>
+      <h2 class="en">Riya sees a shape <em>hiding everywhere.</em></h2>
+      <h2 class="hi" style="display:none">Riya ko ek shape <em>har jagah chhupa</em> dikhti hai.</h2>
+      <p class="en">She's clicking photos near school. A wall meets the ground. A rope goes from ground to a rooftop. A ladder leans on a building. All of them make the <strong>same shape.</strong></p>
+      <p class="hi" style="display:none">Woh school ke paas photos le rahi hai. Wall zameen se milti hai. Rope zameen se rooftop tak. Ladder building se tikti hai. Sab <strong>same shape</strong> banate hain.</p>
+      <div class="diagram-box">
+        <svg viewBox="0 0 260 155" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="135" x2="30" y2="30" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="30" y1="135" x2="100" y2="135" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="30" y1="30" x2="100" y2="135" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <path d="M 30 117 L 46 117 L 46 135" fill="none" stroke="#e85d26" stroke-width="2.5"/>
+          <text x="50" y="148" fill="#555" font-size="9" font-family="DM Sans" text-anchor="middle">🏫 Wall</text>
+          <line x1="155" y1="135" x2="215" y2="135" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="155" y1="135" x2="155" y2="70" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="155" y1="70" x2="215" y2="135" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <path d="M 155 117 L 171 117 L 171 135" fill="none" stroke="#e85d26" stroke-width="2.5"/>
+          <text x="180" y="148" fill="#555" font-size="9" font-family="DM Sans" text-anchor="middle">🪜 Ladder</text>
+        </svg>
+      </div>
+      <p class="en">Look at that corner where the wall meets the ground — it looks exactly like the letter <strong>L.</strong> Same in both. There's something special about that L-corner.</p>
+      <p class="hi" style="display:none">Woh corner dekho jahan wall zameen se milti hai — bilkul <strong>L</strong> letter jaisa. Dono mein same. Us L-corner mein kuch khaas hai.</p>
+    </div>
+
+    <!-- SLIDE 2: L-corner = Right Angle = Right Triangle -->
+    <div class="slide" id="l1s1">
+      <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+      <span class="slide-visual">📐</span>
+      <h2 class="en">That L-corner is called a <em>Right Angle.</em></h2>
+      <h2 class="hi" style="display:none">Woh L-corner <em>Right Angle</em> kehlata hai.</h2>
+      <p class="en">That perfect L-corner is exactly <strong>90°</strong> — called a <em>right angle.</em> Any triangle with one is called a <em>right triangle.</em> This shape is the foundation of everything we're about to discover.</p>
+      <p class="hi" style="display:none">Woh perfect L-corner exactly <strong>90°</strong> hota hai — ise <em>right angle</em> kehte hain. Jis triangle mein yeh hota hai use <em>right triangle</em> kehte hain. Yahi shape aage jo discover karne wale hain uski neev hai.</p>
+      <div class="diagram-box">
+        <svg viewBox="0 0 220 165" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="140" x2="30" y2="30" stroke="#e85d26" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="140" x2="190" y2="140" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="30" x2="190" y2="140" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 118 L 52 118 L 52 140" fill="none" stroke="#e85d26" stroke-width="3"/>
+          <text x="55" y="114" fill="#e85d26" font-size="13" font-family="DM Sans" font-weight="900">90°</text>
+          <text x="55" y="130" fill="#e85d26" font-size="9.5" font-family="DM Sans" font-weight="600">Right Angle</text>
+          <text x="110" y="155" fill="#555" font-size="10" font-family="DM Sans" text-anchor="middle" font-weight="500">Right Triangle</text>
+        </svg>
+      </div>
+      <div class="highlight-box">
+        <span class="en">💡 Wherever something stands straight up from a flat surface — a wall, a tree, a mountain — a right triangle is hiding there. Always.</span>
+        <span class="hi" style="display:none">💡 Jab bhi kuch flat surface se seedha khada hota hai — wall, ped, pahaad — ek right triangle chhupa hota hai. Hamesha.</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Three sides get names — from the angle's eye -->
+    <div class="slide" id="l1s2">
+      <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+      <span class="slide-visual">👁️</span>
+      <h2 class="en">The three sides each have <em>a name.</em></h2>
+      <h2 class="hi" style="display:none">Teen sides mein se har ek ka <em>ek naam</em> hai.</h2>
+      <p class="en">But the names depend on <strong>which corner you're sitting at.</strong> Sit at angle <strong>θ</strong> — the corner that is NOT 90°. Now look around:</p>
+      <p class="hi" style="display:none">Lekin naam depend karte hain <strong>tum kis corner pe baithe ho.</strong> Angle <strong>θ</strong> pe baitho — woh corner jo 90° nahi hai. Ab dekho:</p>
+      <div class="tri-canvas" style="min-height:168px;">
+        <svg viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="145" x2="220" y2="145" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="145" x2="30" y2="22" stroke="#e85d26" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="22" x2="220" y2="145" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 127 L 48 127 L 48 145" fill="none" stroke="#111" stroke-width="2"/>
+          <text x="192" y="138" fill="#e85d26" font-size="16" font-family="DM Sans" font-weight="900">θ</text>
+          <text x="180" y="157" fill="#e85d26" font-size="7.5" font-family="DM Sans" font-weight="700">you sit here</text>
+          <text x="125" y="161" fill="#1565c0" font-size="10.5" font-family="DM Sans" font-weight="700" text-anchor="middle">Adjacent — floor beneath you</text>
+          <text x="6" y="83" fill="#e85d26" font-size="10.5" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-90,6,83)">Opposite — wall in front</text>
+          <text x="134" y="62" fill="#2e7d32" font-size="10.5" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-40,134,62)">Hypotenuse — longest</text>
+        </svg>
+      </div>
+      <div style="display:grid; gap:0.6rem; margin-bottom:0.5rem;">
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#e85d26;">
+          <span class="en">🧱 <strong style="color:var(--accent)">Opposite</strong> = wall directly in front of you. Can't reach without crossing the triangle.</span>
+          <span class="hi" style="display:none">🧱 <strong style="color:var(--accent)">Opposite</strong> = seedha saamne wali wall. Bina triangle cross kiye nahi pahunch sakte.</span>
+        </div>
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#1565c0;">
+          <span class="en">🛣️ <strong style="color:var(--blue)">Adjacent</strong> = floor right beneath you, stretching toward the wall.</span>
+          <span class="hi" style="display:none">🛣️ <strong style="color:var(--blue)">Adjacent</strong> = neeche ki zameen, wall ki taraf jaati hui.</span>
+        </div>
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#2e7d32;">
+          <span class="en">🪢 <strong style="color:var(--green)">Hypotenuse</strong> = always the longest side. Always opposite the 90° corner.</span>
+          <span class="hi" style="display:none">🪢 <strong style="color:var(--green)">Hypotenuse</strong> = hamesha sabse lambi side. Hamesha 90° ke saamne.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Arjun's problem — kid now has context -->
+    <div class="slide" id="l1s3">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <span class="slide-visual">⛰️</span>
+      <h2 class="en">Now — Arjun has a <em>real problem.</em></h2>
+      <h2 class="hi" style="display:none">Ab — Arjun ke paas ek <em>real problem</em> hai.</h2>
+      <p class="en">Arjun is at the base of a mountain. He ties a rope to the top. He knows the <strong>angle (30°)</strong> and the <strong>rope length (80m)</strong>. He wants the <strong>height</strong> — but can't climb.</p>
+      <p class="hi" style="display:none">Arjun pahaad ke neeche hai. Woh top par rope baandhta hai. Usse pata hai <strong>angle (30°)</strong> aur <strong>rope ki length (80m)</strong>. Chahiye <strong>height</strong> — lekin chadh nahi sakta.</p>
+      <div class="tri-canvas" style="min-height:168px;">
+        <svg viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="145" x2="220" y2="145" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+          <line x1="30" y1="145" x2="30" y2="22" stroke="#e85d26" stroke-width="3" stroke-linecap="round" stroke-dasharray="6,4"/>
+          <line x1="30" y1="22" x2="220" y2="145" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 127 L 48 127 L 48 145" fill="none" stroke="#111" stroke-width="2"/>
+          <text x="190" y="138" fill="#555" font-size="11" font-family="DM Sans" font-weight="700">θ=30°</text>
+          <text x="125" y="161" fill="#1565c0" font-size="10" font-family="DM Sans" text-anchor="middle">Adjacent</text>
+          <text x="6" y="83" fill="#e85d26" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,6,83)">❓ Height = ?</text>
+          <text x="134" y="62" fill="#2e7d32" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-40,134,62)">Hypotenuse = 80m</text>
+          <text x="18" y="18" font-size="15">⛰️</text>
+          <text x="210" y="161" font-size="14">🧑‍💻</text>
+        </svg>
+      </div>
+      <div class="highlight-box">
+        <span class="en">He knows <strong>Hypotenuse = 80m</strong> and <strong>θ = 30°</strong>. He wants <strong>Opposite (height)</strong>. Is there some hidden connection between the angle and these two sides?</span>
+        <span class="hi" style="display:none">Usse pata hai <strong>Hypotenuse = 80m</strong> aur <strong>θ = 30°</strong>. Chahiye <strong>Opposite (height)</strong>. Kya angle aur in dono sides ke beech koi chhupa connection hai?</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Triangle animation — names already known -->
+    <div class="slide" id="l1s4">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <h2 class="en">Watch Arjun's triangle <em>form.</em></h2>
+      <h2 class="hi" style="display:none">Arjun ka triangle <em>bante dekho.</em></h2>
+      <p class="en">Mountain, ground, rope — three sides of a right triangle. You already know all three names. Watch each one appear!</p>
+      <p class="hi" style="display:none">Pahaad, zameen, rope — right triangle ki teen sides. Teeno naam tumhe pehle se pata hain. Har ek ko aate dekho!</p>
+      <div class="tri-canvas">
+        <svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+          <line class="tri-side" id="triBase" x1="30" y1="185" x2="215" y2="185" stroke="#1565c0" stroke-width="3.5" stroke-linecap="round"/>
+          <line class="tri-side" id="triHeight" x1="30" y1="185" x2="30" y2="30" stroke="#e85d26" stroke-width="3.5" stroke-linecap="round"/>
+          <line class="tri-side" id="triHyp" x1="30" y1="30" x2="215" y2="185" stroke="#2e7d32" stroke-width="3.5" stroke-linecap="round"/>
+          <path id="triRightAngle" class="tri-label" d="M 30 165 L 50 165 L 50 185" fill="none" stroke="#111" stroke-width="2"/>
+          <text class="tri-label" id="triTheta" x="186" y="178" fill="#555350" font-size="14" font-family="DM Sans" font-weight="700">θ</text>
+          <text class="tri-label" id="labelBase" x="122" y="202" fill="#1565c0" font-size="11" font-family="DM Sans" font-weight="700" text-anchor="middle">Adjacent — Ground</text>
+          <text class="tri-label" id="labelHeight" x="6" y="110" fill="#e85d26" font-size="11" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-90,6,110)">Opposite — Height</text>
+          <text class="tri-label" id="labelHyp" x="140" y="90" fill="#2e7d32" font-size="11" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-40,140,90)">Hypotenuse — Rope (80m)</text>
+          <text class="tri-label" id="triDrone" x="16" y="24" font-size="18">⛰️</text>
+          <text x="202" y="202" font-size="15">🧑‍💻</text>
+        </svg>
+      </div>
+      <button class="btn-primary" onclick="animateL1Triangle()" id="animBtn" style="margin-bottom:0.5rem;">▶ Build the Triangle</button>
+      <p style="font-size:0.8rem; color:var(--ink-light); margin-top:0.5rem;" class="en">θ is where Arjun stands. Opposite = height (unknown). Hypotenuse = rope (80m, known).</p>
+      <p style="font-size:0.8rem; color:var(--ink-light); margin-top:0.5rem; display:none;" class="hi">θ wahan jahan Arjun khada hai. Opposite = height (unknown). Hypotenuse = rope (80m, pata hai).</p>
+    </div>
+
+    <!-- SLIDE 6: Same angle same ratio — ratio briefly explained inline -->
+    <div class="slide" id="l1s5">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <span class="slide-visual">🔬</span>
+      <h2 class="en">Arjun tries something — gets a <em>surprise.</em></h2>
+      <h2 class="hi" style="display:none">Arjun kuch try karta hai — ek <em>surprise</em> milta hai.</h2>
+      <p class="en">Two ropes, both at <strong>30°</strong>. He divides <strong>Opposite ÷ Hypotenuse</strong> for each. <em>(Dividing two numbers = comparing them: "height is what fraction of the rope?")</em></p>
+      <p class="hi" style="display:none">Do ropes, dono <strong>30°</strong> par. Dono ke liye <strong>Opposite ÷ Hypotenuse</strong> divide karta hai. <em>(Do numbers divide karna = compare karna: "height, rope ka kitna fraction hai?")</em></p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
+        <div class="ratio-card">
+          <div style="font-size:0.72rem; color:var(--ink-light); margin-bottom:0.5rem; font-weight:500; text-transform:uppercase;">Short rope</div>
+          <div class="tri-canvas" style="min-height:90px; padding:0.75rem;">
+            <svg viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
+              <line x1="8" y1="72" x2="75" y2="72" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="8" y1="72" x2="8" y2="22" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="8" y1="22" x2="75" y2="72" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 8 58 L 20 58 L 20 72" fill="none" stroke="#111" stroke-width="1.5"/>
+              <text x="62" y="67" fill="#555" font-size="9.5" font-family="DM Sans" font-weight="600">30°</text>
+              <text x="1" y="49" fill="#e85d26" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,1,49)">5m</text>
+              <text x="48" y="36" fill="#2e7d32" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-37,48,36)">10m</text>
+            </svg>
+          </div>
+          <div class="ratio-formula" style="font-size:0.88rem; margin-top:0.4rem;">5 ÷ 10 = <strong style="color:var(--accent); font-size:1rem;">0.5</strong></div>
+        </div>
+        <div class="ratio-card">
+          <div style="font-size:0.72rem; color:var(--ink-light); margin-bottom:0.5rem; font-weight:500; text-transform:uppercase;">Long rope</div>
+          <div class="tri-canvas" style="min-height:90px; padding:0.75rem;">
+            <svg viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
+              <line x1="5" y1="78" x2="90" y2="78" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="5" y1="78" x2="5" y2="8" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="5" y1="8" x2="90" y2="78" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 5 64 L 17 64 L 17 78" fill="none" stroke="#111" stroke-width="1.5"/>
+              <text x="76" y="73" fill="#555" font-size="9.5" font-family="DM Sans" font-weight="600">30°</text>
+              <text x="-2" y="45" fill="#e85d26" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,-2,45)">10m</text>
+              <text x="55" y="34" fill="#2e7d32" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-37,55,34)">20m</text>
+            </svg>
+          </div>
+          <div class="ratio-formula" style="font-size:0.88rem; margin-top:0.4rem;">10 ÷ 20 = <strong style="color:var(--accent); font-size:1rem;">0.5</strong></div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">🤯 <strong>Same angle = same answer. Always.</strong> Rope can be any length — the fraction stays locked at 0.5. This is the entire secret of trigonometry.</span>
+        <span class="hi" style="display:none">🤯 <strong>Same angle = same answer. Hamesha.</strong> Rope kitni bhi lambi ho — fraction 0.5 pe locked. Yahi poori trigonometry ka raaz hai.</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Sin is born -->
+    <div class="slide" id="l1s6">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <span class="slide-visual">📐</span>
+      <h2 class="en">That fraction got a name: <em>Sin.</em></h2>
+      <h2 class="hi" style="display:none">Us fraction ko ek naam mila: <em>Sin.</em></h2>
+      <p class="en">Mathematicians thousands of years ago found this same pattern. They named it <strong>Sine</strong>, written as <strong>Sin.</strong> That's all Sin is — Opposite ÷ Hypotenuse at a given angle.</p>
+      <p class="hi" style="display:none">Hazaaron saal pehle mathematicians ne yahi pattern discover kiya. Unhone iska naam rakha <strong>Sine</strong>, likha jaata hai <strong>Sin.</strong> Bas itna hi hai Sin — ek given angle par Opposite ÷ Hypotenuse.</p>
+      <div class="ratio-card" style="margin-bottom:1.25rem; padding:1.25rem; border-color:var(--accent); text-align:center;">
+        <div class="ratio-name" style="font-size:1.4rem; margin-bottom:0.5rem;">Sin θ = Opposite ÷ Hypotenuse</div>
+        <div class="ratio-formula" style="font-size:0.95rem; line-height:2.0;">
+          <span class="en">Sin 30° = 0.5 → out of every 1m of rope, <strong style="color:var(--accent)">0.5m goes upward.</strong></span>
+          <span class="hi" style="display:none">Sin 30° = 0.5 → rope ke har 1m mein se <strong style="color:var(--accent)">0.5m upar jaata hai.</strong></span>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">💡 Sin is not magic. You discovered the pattern on the last slide. Sin is just the <strong>name for that pattern.</strong></span>
+        <span class="hi" style="display:none">💡 Sin koi magic nahi. Tumne pichhle slide pe pattern discover kiya. Sin sirf us <strong>pattern ka naam hai.</strong></span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Sin Slider -->
+    <div class="slide" id="l1s7">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <h2 class="en">Feel how <em>Sin changes</em> with angle.</h2>
+      <h2 class="hi" style="display:none">Dekho <em>Sin kaise badlata hai</em> angle ke saath.</h2>
+      <p class="en">Drag the slider. Watch the rope tilt, the mountain grow and shrink, Sin update live.</p>
+      <p class="hi" style="display:none">Slider drag karo. Rope tilt hote dekho, pahaad badhte-ghatte dekho, Sin live update hote dekho.</p>
+      <div class="tri-canvas" style="min-height:220px;">
+        <svg id="sinChangeSvg" viewBox="0 0 260 200" xmlns="http://www.w3.org/2000/svg" style="max-width:260px; width:100%;">
+          <line x1="20" y1="175" x2="240" y2="175" stroke="#ddd" stroke-width="1.5"/>
+          <line id="scAdj" x1="130" y1="175" x2="220" y2="175" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+          <line id="scOpp" x1="130" y1="175" x2="130" y2="90" stroke="#e85d26" stroke-width="3" stroke-linecap="round"/>
+          <line id="scHyp" x1="130" y1="90" x2="220" y2="175" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path id="scRA" d="M 130 160 L 145 160 L 145 175" fill="none" stroke="#aaa" stroke-width="1.5"/>
+          <text id="scAngleLabel" x="200" y="168" fill="#555" font-size="12" font-family="DM Sans" font-weight="700">30°</text>
+          <text id="scSinLabel" x="107" y="133" fill="#e85d26" font-size="10" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-90,107,133)">Opposite</text>
+        </svg>
+        <div style="margin-top:0.75rem; text-align:center;">
+          <input type="range" id="sinSlider" min="10" max="80" value="30" style="width:200px; accent-color:var(--accent);" oninput="updateSinViz(this.value)">
+          <div style="margin-top:0.5rem; font-size:0.85rem; color:var(--ink-light);">
+            <span class="en">Angle θ = <strong id="sinAngleVal" style="color:var(--accent)">30°</strong> → Sin θ = <strong id="sinValue" style="color:var(--accent)">0.50</strong></span>
+            <span class="hi" style="display:none">Angle θ = <strong id="sinAngleValHi" style="color:var(--accent)">30°</strong> → Sin θ = <strong id="sinValueHi" style="color:var(--accent)">0.50</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">🎯 Bigger angle → taller Opposite → Sin grows. At 90°: rope straight up, Sin = 1. At 0°: rope flat, Sin = 0.</span>
+        <span class="hi" style="display:none">🎯 Bada angle → unchi Opposite → Sin barhta hai. 90° pe Sin = 1. 0° pe Sin = 0.</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Story closes + Riya's notebook -->
+    <div class="slide" id="l1s8">
+      <div class="slide-char-tag"><span class="ce">🧑‍💻</span><span class="cn">Arjun</span></div>
+      <span class="slide-visual">🎉</span>
+      <h2 class="en">Arjun's problem — <em>solved!</em></h2>
+      <h2 class="hi" style="display:none">Arjun ki problem — <em>solve!</em></h2>
+      <p class="en">Rope = 80m. Angle = 30°. Sin 30° = 0.5.</p>
+      <p class="hi" style="display:none">Rope = 80m. Angle = 30°. Sin 30° = 0.5.</p>
+      <div class="ratio-card" style="margin-bottom:1.25rem; padding:1.25rem; border-color:var(--accent); text-align:left;">
+        <div class="ratio-formula" style="font-size:0.95rem; line-height:2.2;">
+          <span class="en">Opposite = Sin θ × Hypotenuse<br>Height = 0.5 × 80 = <strong style="color:var(--accent); font-size:1.2rem;">40 metres ✅</strong></span>
+          <span class="hi" style="display:none">Opposite = Sin θ × Hypotenuse<br>Height = 0.5 × 80 = <strong style="color:var(--accent); font-size:1.2rem;">40 metres ✅</strong></span>
+        </div>
+      </div>
+      <div class="highlight-box" style="background:#e8f5e9; border-color:#4caf50; border-left-color:#2e7d32;">
+        <span class="en">📓 <strong>Riya's Notebook — entry 1:</strong><br>✅ Sin θ = Opposite ÷ Hypotenuse<br>✅ Height = Sin θ × rope length<br>✅ Bigger angle → bigger Sin<br><em>Cos and Tan → next levels…</em></span>
+        <span class="hi" style="display:none">📓 <strong>Riya ki Notebook — entry 1:</strong><br>✅ Sin θ = Opposite ÷ Hypotenuse<br>✅ Height = Sin θ × rope ki length<br>✅ Bada angle → bada Sin<br><em>Cos aur Tan → agle levels mein…</em></span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Sin Sense game + quiz ready -->
+    <div class="slide" id="l1s9">
+      <div class="slide-char-tag"><span class="ce">📸</span><span class="cn">Riya</span></div>
+      <span class="slide-visual">🎯</span>
+      <h2 class="en"><em>Sin Sense</em> — then quiz!</h2>
+      <h2 class="hi" style="display:none"><em>Sin Sense</em> — phir quiz!</h2>
+      <p class="en">Three gut-feel questions — no formulas, just instinct!</p>
+      <p class="hi" style="display:none">Teen gut-feel sawaal — formula nahi, bas instinct!</p>
+      <div style="display:grid; gap:0.75rem; margin-bottom:1.5rem;" id="sinSenseGame">
+        <div class="ratio-card" id="ssq1" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Angle goes 30° → 60°. What happens to Sin?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Angle 30° → 60°. Sin ka kya hoga?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="ssPick(this,1,'up')" style="flex:1;">📈 Gets bigger</button>
+            <button class="match-btn" onclick="ssPick(this,1,'same')" style="flex:1;">➡️ Stays same</button>
+            <button class="match-btn" onclick="ssPick(this,1,'down')" style="flex:1;">📉 Gets smaller</button>
+          </div>
+          <div id="ssfb1" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+        <div class="ratio-card" id="ssq2" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Rope doubles, angle stays 30°. Does height double?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Rope double, angle 30° same. Height bhi double?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="ssPick(this,2,'yes')" style="flex:1;">✅ Yes</button>
+            <button class="match-btn" onclick="ssPick(this,2,'no')" style="flex:1;">❌ No</button>
+          </div>
+          <div id="ssfb2" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+        <div class="ratio-card" id="ssq3" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Rope goes straight up — angle = 90°. Sin 90° = ?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Rope seedha upar — angle = 90°. Sin 90° = ?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="ssPick(this,3,'0')" style="flex:1;">0</button>
+            <button class="match-btn" onclick="ssPick(this,3,'0.5')" style="flex:1;">0.5</button>
+            <button class="match-btn" onclick="ssPick(this,3,'1')" style="flex:1;">1</button>
+          </div>
+          <div id="ssfb3" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">⭐ <strong>3 quiz questions</strong> next. <strong>10 XP</strong> each. You're ready!</span>
+        <span class="hi" style="display:none">⭐ Aage <strong>3 quiz sawaal.</strong> Har ek <strong>10 XP.</strong> Tum ready ho!</span>
+      </div>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn-ghost" id="l1prevBtn" onclick="l1prevSlide()" style="display:none">← Prev</button>
+      <button class="btn-primary" id="l1nextBtn" onclick="l1nextSlide()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEVEL 2 TEACHING — Zara's City (City Explorer / Sin & Cos deep dive) -->
+<!-- LEVEL 2 TEACHING — Zara's City (Cos only) -->
+<div class="screen" id="level2teach">
+  <div class="teach-screen">
+    <div class="slide-topbar">
+      <button class="slide-back" onclick="showHome()">← Back to map</button>
+      <div class="progress-track" id="l2progTrack"></div>
+      <div style="font-size:0.8rem; color:var(--accent); font-weight:500;">Level 2</div>
+    </div>
+
+    <!-- SLIDE 1: Real scenes where horizontal distance matters -->
+    <div class="slide active" id="l2s0">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span><span class="cr">&nbsp;— Level 2 Guide</span></div>
+      <span class="slide-visual">🌆</span>
+      <h2 class="en">Sin answered <em>height.</em> But what about distance?</h2>
+      <h2 class="hi" style="display:none">Sin ne <em>height</em> batai. Par distance ka kya?</h2>
+      <p class="en">You used Sin in Level 1 to find how high something is. But sometimes the question isn't "how tall?" — it's <strong>"how far away?"</strong></p>
+      <p class="hi" style="display:none">Level 1 mein Sin se height nikali. Par kabhi sawaal yeh nahi hota "kitna ūcha?" — kabhi hota hai <strong>"kitna door?"</strong></p>
+      <div class="diagram-box">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <!-- Cable car scene -->
+          <line x1="20" y1="130" x2="200" y2="130" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="20" y1="130" x2="20" y2="30" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <line x1="20" y1="30" x2="200" y2="130" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M 20 110 L 38 110 L 38 130" fill="none" stroke="#aaa" stroke-width="2"/>
+          <!-- Question marks -->
+          <text x="108" y="143" fill="#1565c0" font-size="10" font-family="DM Sans" font-weight="700" text-anchor="middle">❓ How far? →</text>
+          <text x="10" y="78" fill="#e85d26" font-size="10" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-90,10,78)">↑ Sin gave this</text>
+          <text x="120" y="72" fill="#2e7d32" font-size="9.5" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-28,120,72)">Cable 🚡</text>
+          <text x="8" y="25" font-size="15">🏔️</text>
+          <text x="194" y="143" font-size="14">📷</text>
+        </svg>
+      </div>
+      <div class="highlight-box">
+        <span class="en">📷 Zara is photographing a cable car in Mumbai. The cable is <strong>100m long</strong> at <strong>30°</strong>. She already knows Sin gives the height. But she wants to know: <strong>how far horizontally is the top station?</strong></span>
+        <span class="hi" style="display:none">📷 Zara Mumbai mein cable car ki photo le rahi hai. Cable <strong>100m lambi</strong> hai <strong>30°</strong> par. Sin se height pata hai. Par use jaanna hai: <strong>top station horizontally kitna door hai?</strong></span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Right angle recap, Adjacent is the horizontal side -->
+    <div class="slide" id="l2s1">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">📐</span>
+      <h2 class="en">You already know the triangle. <em>Look at it differently.</em></h2>
+      <h2 class="hi" style="display:none">Triangle tumhe pehle se pata hai. <em>Baar alag nazar se dekho.</em></h2>
+      <p class="en">Same right triangle. Same θ. Same three sides. But this time the question is about <strong>Adjacent</strong> — the floor, the horizontal stretch.</p>
+      <p class="hi" style="display:none">Same right triangle. Same θ. Same teen sides. Par is baar sawaal <strong>Adjacent</strong> ke baare mein hai — zameen, horizontal stretch.</p>
+      <div class="tri-canvas" style="min-height:168px;">
+        <svg viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="145" x2="220" y2="145" stroke="#1565c0" stroke-width="4" stroke-linecap="round"/>
+          <line x1="30" y1="145" x2="30" y2="22" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,3"/>
+          <line x1="30" y1="22" x2="220" y2="145" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 127 L 48 127 L 48 145" fill="none" stroke="#111" stroke-width="2"/>
+          <text x="192" y="138" fill="#e85d26" font-size="15" font-family="DM Sans" font-weight="900">θ</text>
+          <!-- Highlight Adjacent with arrow -->
+          <text x="125" y="161" fill="#1565c0" font-size="11.5" font-family="DM Sans" font-weight="900" text-anchor="middle">← Adjacent — THIS is the question →</text>
+          <text x="6" y="83" fill="#e85d26" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,6,83)">Opposite (height)</text>
+          <text x="134" y="62" fill="#2e7d32" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-40,134,62)">Hypotenuse (cable)</text>
+        </svg>
+      </div>
+      <div style="display:grid; gap:0.6rem;">
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#2e7d32;">
+          <span class="en">✅ <strong>Level 1:</strong> Sin used Opposite ÷ Hypotenuse → gave us the <strong style="color:#e85d26">vertical</strong> part (height)</span>
+          <span class="hi" style="display:none">✅ <strong>Level 1:</strong> Sin ne Opposite ÷ Hypotenuse use kiya → diya <strong style="color:#e85d26">vertical</strong> part (height)</span>
+        </div>
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#1565c0;">
+          <span class="en">❓ <strong>Level 2:</strong> What uses Adjacent ÷ Hypotenuse → gives us the <strong style="color:#1565c0">horizontal</strong> part (distance)?</span>
+          <span class="hi" style="display:none">❓ <strong>Level 2:</strong> Kya Adjacent ÷ Hypotenuse use karta hai → deta hai <strong style="color:#1565c0">horizontal</strong> part (distance)?</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Three sides named from θ — recap but focus on Adjacent -->
+    <div class="slide" id="l2s2">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">👁️</span>
+      <h2 class="en">Sit at θ again. <em>Which side goes forward?</em></h2>
+      <h2 class="hi" style="display:none">Phir se θ pe baitho. <em>Kaun si side aage jaati hai?</em></h2>
+      <p class="en">Same angle's eye view. You know all three sides. But now ask: which side goes <strong>horizontally forward</strong> from where you sit?</p>
+      <p class="hi" style="display:none">Same angle's eye view. Teeno sides pata hain. Par ab poochho: kaun si side tumhare baithne ki jagah se <strong>horizontally aage</strong> jaati hai?</p>
+      <div class="tri-canvas" style="min-height:168px;">
+        <svg viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="145" x2="220" y2="145" stroke="#1565c0" stroke-width="4" stroke-linecap="round"/>
+          <line x1="30" y1="145" x2="30" y2="22" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="30" y1="22" x2="220" y2="145" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 127 L 48 127 L 48 145" fill="none" stroke="#111" stroke-width="2"/>
+          <text x="192" y="138" fill="#e85d26" font-size="15" font-family="DM Sans" font-weight="900">θ</text>
+          <text x="180" y="158" fill="#e85d26" font-size="7.5" font-family="DM Sans" font-weight="700">you sit here</text>
+          <!-- Adjacent highlighted with glow effect -->
+          <rect x="28" y="141" width="194" height="8" fill="#1565c0" fill-opacity="0.15" rx="3"/>
+          <text x="125" y="161" fill="#1565c0" font-size="11" font-family="DM Sans" font-weight="900" text-anchor="middle">Adjacent — runs horizontally toward the wall</text>
+          <text x="6" y="83" fill="#e85d26" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,6,83)">Opposite — goes up</text>
+          <text x="134" y="62" fill="#2e7d32" font-size="10" font-family="DM Sans" text-anchor="middle" transform="rotate(-40,134,62)">Hypotenuse — cable/rope</text>
+        </svg>
+      </div>
+      <div class="highlight-box" style="border-left-color:#1565c0;">
+        <span class="en">🛣️ <strong style="color:var(--blue)">Adjacent</strong> is the side that runs <em>along the ground</em> from your feet to the base of the wall. It answers "how far forward?" not "how far up?"</span>
+        <span class="hi" style="display:none">🛣️ <strong style="color:var(--blue)">Adjacent</strong> woh side hai jo <em>zameen ke saath</em> tumhare pairon se wall ke base tak jaati hai. Yeh "kitna aage?" ka jawab deti hai, "kitna upar?" ka nahi.</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Zara's problem -->
+    <div class="slide" id="l2s3">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">🚡</span>
+      <h2 class="en">Zara's problem — <em>horizontal distance.</em></h2>
+      <h2 class="hi" style="display:none">Zara ki problem — <em>horizontal distance.</em></h2>
+      <p class="en">Cable = <strong>100m</strong>. Angle at ground = <strong>30°</strong>. She wants: <strong>how far horizontally is the top station?</strong> That's the Adjacent. Sin can't give it — Sin only does vertical.</p>
+      <p class="hi" style="display:none">Cable = <strong>100m</strong>. Ground par angle = <strong>30°</strong>. Chahiye: <strong>top station horizontally kitna door hai?</strong> Woh hai Adjacent. Sin nahi de sakta — Sin sirf vertical karta hai.</p>
+      <div class="tri-canvas" style="min-height:168px;">
+        <svg viewBox="0 0 260 168" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="145" x2="220" y2="145" stroke="#1565c0" stroke-width="4" stroke-linecap="round" stroke-dasharray="6,3"/>
+          <line x1="30" y1="145" x2="30" y2="22" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4,3"/>
+          <line x1="30" y1="22" x2="220" y2="145" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 30 127 L 48 127 L 48 145" fill="none" stroke="#111" stroke-width="2"/>
+          <text x="190" y="138" fill="#555" font-size="11" font-family="DM Sans" font-weight="700">θ=30°</text>
+          <text x="125" y="161" fill="#1565c0" font-size="10.5" font-family="DM Sans" font-weight="700" text-anchor="middle">❓ Adjacent = distance = ?</text>
+          <text x="6" y="83" fill="#e85d26" font-size="9.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-90,6,83)">Opposite (height)</text>
+          <text x="134" y="55" fill="#2e7d32" font-size="10.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-40,134,55)">Hypotenuse = 100m ✓</text>
+          <text x="8" y="18" font-size="15">🏔️</text>
+          <text x="212" y="161" font-size="14">📷</text>
+          <!-- Cable car emoji on rope -->
+          <text x="118" y="98" font-size="13">🚡</text>
+        </svg>
+      </div>
+      <div class="highlight-box">
+        <span class="en">Zara knows: <strong>Hypotenuse = 100m</strong> and <strong>θ = 30°</strong>. She wants <strong>Adjacent (horizontal distance)</strong>. Is there a hidden connection between angle and Adjacent ÷ Hypotenuse?</span>
+        <span class="hi" style="display:none">Zara ko pata hai: <strong>Hypotenuse = 100m</strong> aur <strong>θ = 30°</strong>. Chahiye <strong>Adjacent (horizontal distance)</strong>. Kya angle aur Adjacent ÷ Hypotenuse ke beech koi chhupa connection hai?</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Triangle animation -->
+    <div class="slide" id="l2s4">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <h2 class="en">Watch Zara's cable car triangle <em>form.</em></h2>
+      <h2 class="hi" style="display:none">Zara ka cable car triangle <em>bante dekho.</em></h2>
+      <p class="en">Ground, height, cable — three sides. The <strong style="color:#1565c0">blue</strong> side (Adjacent) is the question this time!</p>
+      <p class="hi" style="display:none">Zameen, height, cable — teen sides. <strong style="color:#1565c0">Neeli</strong> side (Adjacent) is baar ka sawaal hai!</p>
+      <div class="tri-canvas">
+        <svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+          <line class="tri-side" id="l2triBase" x1="30" y1="185" x2="215" y2="185" stroke="#1565c0" stroke-width="4" stroke-linecap="round"/>
+          <line class="tri-side" id="l2triHeight" x1="30" y1="185" x2="30" y2="30" stroke="#e85d26" stroke-width="2.5" stroke-linecap="round"/>
+          <line class="tri-side" id="l2triHyp" x1="30" y1="30" x2="215" y2="185" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path id="l2triRA" class="tri-label" d="M 30 165 L 50 165 L 50 185" fill="none" stroke="#111" stroke-width="2"/>
+          <text class="tri-label" id="l2triTheta" x="186" y="178" fill="#555" font-size="14" font-family="DM Sans" font-weight="700">θ</text>
+          <text class="tri-label" id="l2labelBase" x="122" y="202" fill="#1565c0" font-size="11" font-family="DM Sans" font-weight="900" text-anchor="middle">Adjacent — Horizontal distance ❓</text>
+          <text class="tri-label" id="l2labelHeight" x="6" y="110" fill="#e85d26" font-size="10" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-90,6,110)">Opposite — Height</text>
+          <text class="tri-label" id="l2labelHyp" x="140" y="90" fill="#2e7d32" font-size="10" font-family="DM Sans" font-weight="700" text-anchor="middle" transform="rotate(-40,140,90)">Hypotenuse — Cable (100m)</text>
+          <text class="tri-label" id="l2triTop" x="16" y="24" font-size="17">🏔️</text>
+          <text x="202" y="202" font-size="14">📷</text>
+        </svg>
+      </div>
+      <button class="btn-primary" onclick="animateL2Triangle()" id="l2animBtn" style="margin-bottom:0.5rem;">▶ Build the Triangle</button>
+      <p style="font-size:0.8rem; color:var(--ink-light); margin-top:0.5rem;" class="en">θ is where Zara stands. Adjacent = horizontal distance (unknown). Hypotenuse = cable (100m, known).</p>
+      <p style="font-size:0.8rem; color:var(--ink-light); margin-top:0.5rem; display:none;" class="hi">θ wahan jahan Zara khadi hai. Adjacent = horizontal distance (unknown). Hypotenuse = cable (100m, pata hai).</p>
+    </div>
+
+    <!-- SLIDE 6: Same angle same Cos ratio — aha moment -->
+    <div class="slide" id="l2s5">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">🔬</span>
+      <h2 class="en">Zara tries the same trick — <em>another surprise.</em></h2>
+      <h2 class="hi" style="display:none">Zara wahi trick try karti hai — <em>ek aur surprise.</em></h2>
+      <p class="en">Two cables at <strong>30°</strong> — different lengths. She divides <strong>Adjacent ÷ Hypotenuse</strong> for each.</p>
+      <p class="hi" style="display:none">Do cables <strong>30°</strong> par — alag lengths. Dono ke liye <strong>Adjacent ÷ Hypotenuse</strong> divide karti hai.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
+        <div class="ratio-card">
+          <div style="font-size:0.72rem; color:var(--ink-light); margin-bottom:0.5rem; font-weight:500; text-transform:uppercase;">Short cable</div>
+          <div class="tri-canvas" style="min-height:90px; padding:0.75rem;">
+            <svg viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
+              <line x1="8" y1="72" x2="75" y2="72" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+              <line x1="8" y1="72" x2="8" y2="30" stroke="#e85d26" stroke-width="2" stroke-linecap="round"/>
+              <line x1="8" y1="30" x2="75" y2="72" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 8 58 L 20 58 L 20 72" fill="none" stroke="#111" stroke-width="1.5"/>
+              <text x="62" y="67" fill="#555" font-size="9.5" font-family="DM Sans" font-weight="600">30°</text>
+              <text x="42" y="80" fill="#1565c0" font-size="8.5" font-family="DM Sans" text-anchor="middle" font-weight="700">8.7m</text>
+              <text x="48" y="46" fill="#2e7d32" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-32,48,46)">10m</text>
+            </svg>
+          </div>
+          <div class="ratio-formula" style="font-size:0.88rem; margin-top:0.4rem;">8.7 ÷ 10 = <strong style="color:var(--blue); font-size:1rem;">0.87</strong></div>
+        </div>
+        <div class="ratio-card">
+          <div style="font-size:0.72rem; color:var(--ink-light); margin-bottom:0.5rem; font-weight:500; text-transform:uppercase;">Long cable</div>
+          <div class="tri-canvas" style="min-height:90px; padding:0.75rem;">
+            <svg viewBox="0 0 100 85" xmlns="http://www.w3.org/2000/svg">
+              <line x1="5" y1="78" x2="90" y2="78" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+              <line x1="5" y1="78" x2="5" y2="36" stroke="#e85d26" stroke-width="2" stroke-linecap="round"/>
+              <line x1="5" y1="36" x2="90" y2="78" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 5 64 L 17 64 L 17 78" fill="none" stroke="#111" stroke-width="1.5"/>
+              <text x="76" y="73" fill="#555" font-size="9.5" font-family="DM Sans" font-weight="600">30°</text>
+              <text x="48" y="86" fill="#1565c0" font-size="8.5" font-family="DM Sans" text-anchor="middle" font-weight="700">17.3m</text>
+              <text x="52" y="52" fill="#2e7d32" font-size="8.5" font-family="DM Sans" text-anchor="middle" transform="rotate(-26,52,52)">20m</text>
+            </svg>
+          </div>
+          <div class="ratio-formula" style="font-size:0.88rem; margin-top:0.4rem;">17.3 ÷ 20 = <strong style="color:var(--blue); font-size:1rem;">0.87</strong></div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">🤯 <strong>Same angle = same Adjacent ÷ Hypotenuse. Always.</strong> Just like Sin, this fraction is locked by the angle. Different cable length, same result.</span>
+        <span class="hi" style="display:none">🤯 <strong>Same angle = same Adjacent ÷ Hypotenuse. Hamesha.</strong> Sin ki tarah, yeh fraction angle se lock hai. Cable ki length alag, result same.</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Cos is born -->
+    <div class="slide" id="l2s6">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">🧭</span>
+      <h2 class="en">That fraction also got a name: <em>Cos.</em></h2>
+      <h2 class="hi" style="display:none">Us fraction ko bhi ek naam mila: <em>Cos.</em></h2>
+      <p class="en">The same mathematicians who named Sin also named this one. They called it <strong>Cosine</strong> — written as <strong>Cos.</strong> It's Adjacent ÷ Hypotenuse at a given angle.</p>
+      <p class="hi" style="display:none">Jinh mathematicians ne Sin ka naam rakha unhi ne is ka bhi naam rakha. Unhone kaha <strong>Cosine</strong> — likha jaata hai <strong>Cos.</strong> Yeh hai Adjacent ÷ Hypotenuse ek given angle par.</p>
+      <div class="ratio-card" style="margin-bottom:1rem; padding:1.25rem; border-color:#1565c0; text-align:center;">
+        <div class="ratio-name" style="font-size:1.4rem; margin-bottom:0.5rem; color:#1565c0;">Cos θ = Adjacent ÷ Hypotenuse</div>
+        <div class="ratio-formula" style="font-size:0.95rem; line-height:2.0;">
+          <span class="en">Cos 30° ≈ 0.87 → out of every 1m of cable, <strong style="color:#1565c0">0.87m goes forward.</strong></span>
+          <span class="hi" style="display:none">Cos 30° ≈ 0.87 → cable ke har 1m mein se <strong style="color:#1565c0">0.87m aage jaata hai.</strong></span>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#e85d26;">
+          <span class="en">📐 <strong style="color:var(--accent)">Sin θ</strong> = Opp ÷ Hyp<br><em>how much goes UP</em></span>
+          <span class="hi" style="display:none">📐 <strong style="color:var(--accent)">Sin θ</strong> = Opp ÷ Hyp<br><em>kitna UPAR jaata hai</em></span>
+        </div>
+        <div class="highlight-box" style="margin-bottom:0; border-left-color:#1565c0;">
+          <span class="en">🧭 <strong style="color:var(--blue)">Cos θ</strong> = Adj ÷ Hyp<br><em>how much goes FORWARD</em></span>
+          <span class="hi" style="display:none">🧭 <strong style="color:var(--blue)">Cos θ</strong> = Adj ÷ Hyp<br><em>kitna AAGE jaata hai</em></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Sin + Cos slider together -->
+    <div class="slide" id="l2s7">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <h2 class="en">Feel how <em>Cos changes</em> — and how it relates to Sin.</h2>
+      <h2 class="hi" style="display:none">Dekho <em>Cos kaise badlata hai</em> — aur Sin se kaisa relate karta hai.</h2>
+      <p class="en">Drag the slider. Watch both update live. Notice what happens when one goes up — the other goes down!</p>
+      <p class="hi" style="display:none">Slider drag karo. Dono live update dekho. Notice karo jab ek badhta hai — doosra ghatta hai!</p>
+      <div class="tri-canvas" style="min-height:200px;">
+        <svg id="cosSvg" viewBox="0 0 260 190" xmlns="http://www.w3.org/2000/svg" style="max-width:260px; width:100%;">
+          <line x1="20" y1="170" x2="240" y2="170" stroke="#ddd" stroke-width="1.5"/>
+          <line id="cosAdj" x1="130" y1="170" x2="220" y2="170" stroke="#1565c0" stroke-width="4" stroke-linecap="round"/>
+          <line id="cosOpp" x1="130" y1="170" x2="130" y2="85" stroke="#e85d26" stroke-width="3" stroke-linecap="round"/>
+          <line id="cosHyp" x1="130" y1="85" x2="220" y2="170" stroke="#2e7d32" stroke-width="3" stroke-linecap="round"/>
+          <path id="cosRA" d="M 130 155 L 145 155 L 145 170" fill="none" stroke="#aaa" stroke-width="1.5"/>
+          <text id="cosAngleLabel" x="200" y="163" fill="#555" font-size="12" font-family="DM Sans" font-weight="700">30°</text>
+        </svg>
+        <div style="margin-top:0.75rem; text-align:center;">
+          <input type="range" id="cosSlider" min="10" max="80" value="30" style="width:200px; accent-color:#1565c0;" oninput="updateCosViz(this.value)">
+          <div style="margin-top:0.6rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; max-width:260px; margin-left:auto; margin-right:auto;">
+            <div style="font-size:0.82rem; background:#fff3ee; border-radius:8px; padding:0.4rem 0.6rem; text-align:center;">
+              <span style="color:#e85d26; font-weight:700;">Sin <span id="cosSliderAngle">30</span>°</span><br>
+              <strong id="cosSliderSin" style="color:#e85d26; font-size:1.05rem;">0.50</strong>
+            </div>
+            <div style="font-size:0.82rem; background:#e8f0fe; border-radius:8px; padding:0.4rem 0.6rem; text-align:center;">
+              <span style="color:#1565c0; font-weight:700;">Cos <span id="cosSliderAngle2">30</span>°</span><br>
+              <strong id="cosSliderCos" style="color:#1565c0; font-size:1.05rem;">0.87</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">🎯 As angle grows: Sin↑ (more goes up) and Cos↓ (less goes forward). At 0°: all forward (Cos=1, Sin=0). At 90°: all up (Sin=1, Cos=0).</span>
+        <span class="hi" style="display:none">🎯 Angle barhne par: Sin↑ (zyada upar) aur Cos↓ (kam aage). 0° pe: sab aage (Cos=1, Sin=0). 90° pe: sab upar (Sin=1, Cos=0).</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Story closes -->
+    <div class="slide" id="l2s8">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">🎉</span>
+      <h2 class="en">Zara's shot — <em>perfectly framed!</em></h2>
+      <h2 class="hi" style="display:none">Zara ka shot — <em>perfectly framed!</em></h2>
+      <p class="en">Cable = 100m. Angle = 30°. Cos 30° ≈ 0.87.</p>
+      <p class="hi" style="display:none">Cable = 100m. Angle = 30°. Cos 30° ≈ 0.87.</p>
+      <div class="ratio-card" style="margin-bottom:1.25rem; padding:1.25rem; border-color:#1565c0; text-align:left;">
+        <div class="ratio-formula" style="font-size:0.95rem; line-height:2.2;">
+          <span class="en">Adjacent = Cos θ × Hypotenuse<br>Distance = 0.87 × 100 = <strong style="color:#1565c0; font-size:1.2rem;">87 metres ✅</strong></span>
+          <span class="hi" style="display:none">Adjacent = Cos θ × Hypotenuse<br>Distance = 0.87 × 100 = <strong style="color:#1565c0; font-size:1.2rem;">87 metres ✅</strong></span>
+        </div>
+      </div>
+      <div class="highlight-box" style="background:#e8f0fe; border-color:#90caf9; border-left-color:#1565c0;">
+        <span class="en">📓 <strong>Riya's Notebook — entry 2:</strong><br>✅ Cos θ = Adjacent ÷ Hypotenuse<br>✅ Distance = Cos θ × cable length<br>✅ Bigger angle → smaller Cos (less goes forward)<br><em>Tan (steepness) → Level 3…</em></span>
+        <span class="hi" style="display:none">📓 <strong>Riya ki Notebook — entry 2:</strong><br>✅ Cos θ = Adjacent ÷ Hypotenuse<br>✅ Distance = Cos θ × cable ki length<br>✅ Bada angle → chota Cos (kam aage)<br><em>Tan (steepness) → Level 3…</em></span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Cos Sense game + quiz ready -->
+    <div class="slide" id="l2s9">
+      <div class="slide-char-tag"><span class="ce">📷</span><span class="cn">Zara</span></div>
+      <span class="slide-visual">🎯</span>
+      <h2 class="en"><em>Cos Sense</em> — then quiz!</h2>
+      <h2 class="hi" style="display:none"><em>Cos Sense</em> — phir quiz!</h2>
+      <p class="en">Three gut-feel questions — no formulas, just instinct!</p>
+      <p class="hi" style="display:none">Teen gut-feel sawaal — formula nahi, bas instinct!</p>
+      <div style="display:grid; gap:0.75rem; margin-bottom:1.5rem;" id="cosSenseGame">
+        <div class="ratio-card" id="csq1" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Angle goes 30° → 60°. What happens to Cos?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Angle 30° → 60°. Cos ka kya hoga?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="csPick(this,1,'up')" style="flex:1;">📈 Gets bigger</button>
+            <button class="match-btn" onclick="csPick(this,1,'same')" style="flex:1;">➡️ Stays same</button>
+            <button class="match-btn" onclick="csPick(this,1,'down')" style="flex:1;">📉 Gets smaller</button>
+          </div>
+          <div id="csfb1" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+        <div class="ratio-card" id="csq2" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Cable doubles, angle stays 30°. Does horizontal distance double?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Cable double, angle 30° same. Horizontal distance bhi double?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="csPick(this,2,'yes')" style="flex:1;">✅ Yes</button>
+            <button class="match-btn" onclick="csPick(this,2,'no')" style="flex:1;">❌ No</button>
+          </div>
+          <div id="csfb2" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+        <div class="ratio-card" id="csq3" style="padding:1.1rem;">
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink);" class="en">Cable goes flat — angle = 0°. Cos 0° = ?</div>
+          <div style="font-size:0.88rem; font-weight:500; margin-bottom:0.6rem; color:var(--ink); display:none;" class="hi">Cable flat — angle = 0°. Cos 0° = ?</div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="match-btn" onclick="csPick(this,3,'0')" style="flex:1;">0</button>
+            <button class="match-btn" onclick="csPick(this,3,'0.5')" style="flex:1;">0.5</button>
+            <button class="match-btn" onclick="csPick(this,3,'1')" style="flex:1;">1</button>
+          </div>
+          <div id="csfb3" style="margin-top:0.5rem; font-size:0.82rem; min-height:1.2rem;"></div>
+        </div>
+      </div>
+      <div class="highlight-box">
+        <span class="en">⭐ <strong>3 quiz questions</strong> next. <strong>10 XP</strong> each. You're ready!</span>
+        <span class="hi" style="display:none">⭐ Aage <strong>3 quiz sawaal.</strong> Har ek <strong>10 XP.</strong> Tum ready ho!</span>
+      </div>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn-ghost" id="l2prevBtn" onclick="l2prevSlide()" style="display:none">← Prev</button>
+      <button class="btn-primary" id="l2nextBtn" onclick="l2nextSlide()">Next →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- LEVEL 1 QUIZ -->
+<div class="screen" id="levelScreen">
+  <div class="quiz-topbar">
+    <div>
+      <button class="slide-back" onclick="showHome()" style="margin-bottom:0.4rem;display:block;">← Back to map</button>
+      <div class="quiz-title" id="levelTitle">Level 1 — The Triangle Gang</div>
+      <div class="quiz-sub" id="levelSub">Question 1 of 3</div>
+    </div>
+    <div class="xp-pill" id="levelXP">⭐ 0 XP</div>
+  </div>
+  <div class="q-progress"><div class="q-progress-fill" id="qProgressFill" style="width:33%"></div></div>
+  <div class="story-box">
+    <div class="story-char" id="storyChar">🧑‍💻</div>
+    <div>
+      <div class="story-name" id="storyName">Arjun</div>
+      <div class="story-text" id="storyText"></div>
+    </div>
+  </div>
+  <div class="question-box">
+    <div class="q-text" id="qText"></div>
+    <div class="options-grid" id="optionsGrid"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+  </div>
+  <div style="margin-top:1rem;">
+    <button class="btn-primary" id="nextQBtn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+  </div>
+</div>
+
+<!-- COMPLETION -->
+<div class="screen" id="completionScreen">
+  <span class="completion-emoji">🏆</span>
+  <div class="completion-title">Level <em>Complete!</em></div>
+  <div class="completion-xp" id="completionXP">+30 XP earned</div>
+  <p class="completion-msg" id="completionMsg"></p>
+  <div class="completion-actions">
+    <button class="btn-ghost" onclick="showHome()">🗺️ Back to Map</button>
+    <button class="btn-primary" onclick="showHome()">Continue →</button>
+  </div>
+</div>
+
+<script>
+  let xp = 0, currentSlide = 0, currentQ = 0, answered = false, lang = 'en';
+  const totalSlides = 5;
+
+  // L1 teach state
+  let l1Slide = 0; const l1Total = 10;
+  let l1TriAnimated = false;
+
+  // L2 teach state
+  let l2Slide = 0; const l2Total = 10;
+  let l2TriAnimated = false, l2SinAnimated = false;
+
+  const level1 = {
+    story: {
+      char: "🧑‍💻", name: "Arjun",
+      en: "Arjun is standing at the base of a mountain with a rope. He knows the rope length and the angle. Can you help him find the height using Sin?",
+      hi: "Arjun pahaad ke neeche rope lekar khada hai. Rope ki length aur angle pata hai. Sin se height nikalne mein help karo?"
+    },
+    questions: [
+      {
+        en: "Arjun's rope is 60m long and makes a 30° angle. Sin 30° = 0.5. How tall is the mountain?",
+        hi: "Arjun ki rope 60m lambi hai aur 30° angle banati hai. Sin 30° = 0.5. Pahaad kitna ūcha hai?",
+        opts: { en: ["10m","20m","30m","60m"], hi: ["10m","20m","30m","60m"] },
+        correct: 2,
+        fb: { en: "✅ Height = Sin 30° × 60 = 0.5 × 60 = 30m. Sin × Hypotenuse = Opposite (height)!", hi: "✅ Height = Sin 30° × 60 = 0.5 × 60 = 30m. Sin × Hypotenuse = Opposite (height)!" }
+      },
+      {
+        en: "Which side is the 'Opposite' when you're sitting at angle θ?",
+        hi: "Angle θ pe baithe ho toh 'Opposite' side kaun si hai?",
+        opts: { en: ["The floor beneath you","The rope in your hand","The wall in front of you","The 90° corner"], hi: ["Neeche ki zameen","Haath mein rope","Saamne ki wall","90° ka kona"] },
+        correct: 2,
+        fb: { en: "✅ Yes! Opposite = the wall in front of you from angle θ. That's what Sin measures!", hi: "✅ Sahi! Opposite = angle θ se saamne wali wall. Yahi Sin measure karta hai!" }
+      },
+      {
+        en: "A rope 100m long is at angle 90° — it goes straight up. What is Sin 90°?",
+        hi: "100m ki rope 90° par hai — seedha upar. Sin 90° kya hai?",
+        opts: { en: ["0","0.5","0.707","1"], hi: ["0","0.5","0.707","1"] },
+        correct: 3,
+        fb: { en: "✅ Sin 90° = 1. The entire rope goes upward — Opposite = Hypotenuse. That's the maximum Sin can be!", hi: "✅ Sin 90° = 1. Poori rope upar jaati hai — Opposite = Hypotenuse. Yahi Sin ki maximum value hai!" }
+      }
+    ]
+  };
+
+  const level2 = {
+    story: {
+      char: "📷", name: "Zara",
+      en: "Zara is photographing Mumbai's cable cars. Help her use Cos to find horizontal distances!",
+      hi: "Zara Mumbai ke cable cars ki photos le rahi hai. Cos se horizontal distances nikalne mein uski help karo!"
+    },
+    questions: [
+      {
+        en: "Zara's cable is 100m long at 30°. How far horizontally is the top station? (Cos 30° ≈ 0.87)",
+        hi: "Zara ki cable 30° par 100m lambi hai. Top station horizontally kitna door hai? (Cos 30° ≈ 0.87)",
+        opts: { en: ["50m","87m","100m","70m"], hi: ["50m","87m","100m","70m"] },
+        correct: 1,
+        fb: { en: "✅ Distance = Cos 30° × 100 = 0.87 × 100 = 87m. Cos finds the horizontal!", hi: "✅ Distance = Cos 30° × 100 = 0.87 × 100 = 87m. Cos horizontal nikalti hai!" }
+      },
+      {
+        en: "A 60m cable is at 60°. What is the horizontal distance? (Cos 60° = 0.5)",
+        hi: "60m ki cable 60° par hai. Horizontal distance kya hai? (Cos 60° = 0.5)",
+        opts: { en: ["10m","20m","30m","40m"], hi: ["10m","20m","30m","40m"] },
+        correct: 2,
+        fb: { en: "✅ Distance = Cos 60° × 60 = 0.5 × 60 = 30m.", hi: "✅ Distance = Cos 60° × 60 = 0.5 × 60 = 30m." }
+      },
+      {
+        en: "A ramp is 50m long. You want HOW FAR FORWARD it covers. Which formula?",
+        hi: "Ramp 50m lambi hai. Kitna AAGE cover karta hai — kaun sa formula?",
+        opts: { en: ["Sin θ × 50","Cos θ × 50","50 ÷ Cos θ","Tan θ × 50"], hi: ["Sin θ × 50","Cos θ × 50","50 ÷ Cos θ","Tan θ × 50"] },
+        correct: 1,
+        fb: { en: "✅ Cos θ × length = horizontal distance. Cos = forward. Always!", hi: "✅ Cos θ × length = horizontal distance. Cos = aage. Hamesha!" }
+      }
+    ]
+  };
+
+  /* ---- LANGUAGE ---- */
+  function setLang(l) {
+    lang = l;
+    document.body.classList.toggle('hindi', l === 'hi');
+    document.querySelectorAll('.lang-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && l === 'en') || (i === 1 && l === 'hi'));
+    });
+  }
+
+  /* ---- SCREENS ---- */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function showHome() { updateXP(); showScreen('home'); }
+
+  /* ---- LEVEL 0 ---- */
+  function goToLevel0() {
+    currentSlide = 0; buildProgress(); showScreen('level0'); updateSlide();
+  }
+  function buildProgress() {
+    const t = document.getElementById('progTrack');
+    t.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+      const d = document.createElement('div'); d.className = 'prog-dot'; t.appendChild(d);
+    }
+    updateProgress();
+  }
+  function updateProgress() {
+    document.querySelectorAll('#progTrack .prog-dot').forEach((d, i) => {
+      d.classList.remove('active','done');
+      if (i < currentSlide) d.classList.add('done');
+      else if (i === currentSlide) d.classList.add('active');
+    });
+  }
+  function updateSlide() {
+    document.querySelectorAll('#level0 .slide').forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+    updateProgress();
+    document.getElementById('prevBtn').style.display = currentSlide > 0 ? 'inline-block' : 'none';
+    const nb = document.getElementById('nextBtn');
+    if (currentSlide === totalSlides - 1) {
+      nb.textContent = lang === 'hi' ? 'Level 1 शुरू करो! 🎮' : 'Start Level 1! 🎮';
+      nb.onclick = () => { addXP(20); goToLevel1teach(); };
+    } else {
+      nb.textContent = lang === 'hi' ? 'आगे →' : 'Next →';
+      nb.onclick = nextSlide;
+    }
+  }
+  function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+  function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+  /* ---- LEVEL 1 TEACH ---- */
+  function goToLevel1teach() {
+    l1Slide = 0; l1TriAnimated = false;
+    l1SelectedRatio = null; l1SelectedFormula = null;
+    buildL1Progress(); showScreen('level1teach'); updateL1Slide();
+    // reset Sin Sense game
+    [1,2,3].forEach(n => {
+      const card = document.getElementById('ssq'+n);
+      if (card) card.querySelectorAll('.match-btn').forEach(b => { b.className = 'match-btn'; b.disabled = false; });
+      const fb = document.getElementById('ssfb'+n);
+      if (fb) fb.innerHTML = '';
+    });
+    // reset triangle animation
+    ['triBase','triHeight','triHyp'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('draw'); });
+    ['triRightAngle','triTheta','labelBase','labelHeight','labelHyp','triDrone'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('show'); });
+    const ab = document.getElementById('animBtn'); if(ab) ab.style.display = 'inline-block';
+    // reset sin slider
+    const sl = document.getElementById('sinSlider'); if(sl) { sl.value = 30; updateSinViz(30); }
+  }
+  function buildL1Progress() {
+    const t = document.getElementById('l1progTrack');
+    t.innerHTML = '';
+    for (let i = 0; i < l1Total; i++) {
+      const d = document.createElement('div'); d.className = 'prog-dot'; t.appendChild(d);
+    }
+    updateL1Progress();
+  }
+  function updateL1Progress() {
+    document.querySelectorAll('#l1progTrack .prog-dot').forEach((d, i) => {
+      d.classList.remove('active','done');
+      if (i < l1Slide) d.classList.add('done');
+      else if (i === l1Slide) d.classList.add('active');
+    });
+  }
+  function updateL1Slide() {
+    document.querySelectorAll('#level1teach .slide').forEach((s, i) => s.classList.toggle('active', i === l1Slide));
+    updateL1Progress();
+    document.getElementById('l1prevBtn').style.display = l1Slide > 0 ? 'inline-block' : 'none';
+    const nb = document.getElementById('l1nextBtn');
+    if (l1Slide === l1Total - 1) {
+      nb.textContent = lang === 'hi' ? 'Quiz खेलो! 🎮' : 'Play Quiz! 🎮';
+      nb.onclick = () => { goToLevel(1); };
+    } else {
+      nb.textContent = lang === 'hi' ? 'आगे →' : 'Next →';
+      nb.onclick = l1nextSlide;
+    }
+  }
+  function l1nextSlide() { if (l1Slide < l1Total - 1) { l1Slide++; updateL1Slide(); } }
+  function l1prevSlide() { if (l1Slide > 0) { l1Slide--; updateL1Slide(); } }
+
+  function animateL1Triangle() {
+    if (l1TriAnimated) return;
+    l1TriAnimated = true;
+    document.getElementById('animBtn').style.display = 'none';
+    setTimeout(() => document.getElementById('triBase').classList.add('draw'), 100);
+    setTimeout(() => document.getElementById('labelBase').classList.add('show'), 900);
+    setTimeout(() => document.getElementById('triHeight').classList.add('draw'), 1200);
+    setTimeout(() => document.getElementById('labelHeight').classList.add('show'), 2000);
+    setTimeout(() => document.getElementById('triHyp').classList.add('draw'), 2300);
+    setTimeout(() => document.getElementById('labelHyp').classList.add('show'), 3100);
+    setTimeout(() => { document.getElementById('triRightAngle').classList.add('show'); document.getElementById('triTheta').classList.add('show'); }, 3400);
+    setTimeout(() => document.getElementById('triDrone').classList.add('show'), 3700);
+  }
+
+  /* ---- SIN SENSE MINI GAME ---- */
+  const ssCorrect = { 1: 'up', 2: 'yes', 3: '1' };
+  const ssFeedback = {
+    1: { right: { en: '✅ Yes! Bigger angle → Opposite grows → Sin gets bigger!', hi: '✅ Sahi! Bada angle → Opposite barhta hai → Sin bada hota hai!' }, wrong: { en: '❌ Nope — bigger angle always means bigger Sin. Try the slider on slide 6!', hi: '❌ Nahi — bada angle matlab bada Sin. Slide 6 ka slider try karo!' } },
+    2: { right: { en: '✅ Exactly! Height = Sin θ × rope. Double rope → double height. Sin stays same (angle same)!', hi: '✅ Bilkul! Height = Sin θ × rope. Double rope → double height. Sin same rehta hai (angle same)!' }, wrong: { en: '❌ Yes it does! Height = Sin 30° × rope. Rope doubles → height doubles.', hi: '❌ Haan hoti hai! Height = Sin 30° × rope. Rope double → height double.' } },
+    3: { right: { en: '✅ Perfect! Sin 90° = 1. The rope goes straight up — Opposite = Hypotenuse!', hi: '✅ Perfect! Sin 90° = 1. Rope seedha upar — Opposite = Hypotenuse!' }, wrong: { en: '❌ It\'s 1! At 90°, all of the rope goes upward. Opposite = Hypotenuse = 1.', hi: '❌ 1 hai! 90° pe poori rope upar. Opposite = Hypotenuse = 1.' } }
+  };
+  function ssPick(btn, qNum, ans) {
+    const card = document.getElementById('ssq' + qNum);
+    card.querySelectorAll('.match-btn').forEach(b => b.disabled = true);
+    const fb = document.getElementById('ssfb' + qNum);
+    const isRight = ans === ssCorrect[qNum];
+    if (isRight) {
+      btn.classList.add('matched');
+      fb.innerHTML = `<span style="color:var(--green)">${lang === 'hi' ? ssFeedback[qNum].right.hi : ssFeedback[qNum].right.en}</span>`;
+      addXP(4);
+    } else {
+      btn.classList.add('wrong-flash');
+      fb.innerHTML = `<span style="color:#c2185b">${lang === 'hi' ? ssFeedback[qNum].wrong.hi : ssFeedback[qNum].wrong.en}</span>`;
+      setTimeout(() => btn.classList.remove('wrong-flash'), 700);
+    }
+  }
+
+  /* ---- SIN SLIDER ANIMATION ---- */
+  function updateSinViz(deg) {
+    deg = parseInt(deg);
+    const rad = deg * Math.PI / 180;
+    const sinVal = Math.sin(rad);
+    // SVG coords: pivot at (220,175), hyp length ~90
+    const hypLen = 90;
+    const ox = 220 - hypLen * Math.cos(rad);
+    const oy = 175 - hypLen * Math.sin(rad);
+    // Update lines
+    document.getElementById('scAdj').setAttribute('x1', ox);
+    document.getElementById('scAdj').setAttribute('y1', '175');
+    document.getElementById('scAdj').setAttribute('x2', '220');
+    document.getElementById('scAdj').setAttribute('y2', '175');
+    document.getElementById('scOpp').setAttribute('x1', ox);
+    document.getElementById('scOpp').setAttribute('y1', String(oy));
+    document.getElementById('scOpp').setAttribute('x2', ox);
+    document.getElementById('scOpp').setAttribute('y2', '175');
+    document.getElementById('scHyp').setAttribute('x1', ox);
+    document.getElementById('scHyp').setAttribute('y1', String(oy));
+    document.getElementById('scHyp').setAttribute('x2', '220');
+    document.getElementById('scHyp').setAttribute('y2', '175');
+    // Right angle
+    document.getElementById('scRA').setAttribute('d', `M ${ox} ${175-14} L ${ox+14} ${175-14} L ${ox+14} 175`);
+    // Angle label
+    document.getElementById('scAngleLabel').setAttribute('x', 200);
+    document.getElementById('scAngleLabel').textContent = deg + '°';
+    // Sin label
+    const midY = (oy + 175) / 2;
+    document.getElementById('scSinLabel').setAttribute('x', ox - 13);
+    document.getElementById('scSinLabel').setAttribute('y', String(midY));
+    document.getElementById('scSinLabel').setAttribute('transform', `rotate(-90,${ox-13},${midY})`);
+    // Update display values
+    const sinStr = sinVal.toFixed(2);
+    document.getElementById('sinAngleVal').textContent = deg + '°';
+    document.getElementById('sinValue').textContent = sinStr;
+    if (document.getElementById('sinAngleValHi')) document.getElementById('sinAngleValHi').textContent = deg + '°';
+    if (document.getElementById('sinValueHi')) document.getElementById('sinValueHi').textContent = sinStr;
+  }
+
+  // Match game L1 (kept as stub — replaced by Sin Sense game)
+  let l1SelectedRatio = null, l1SelectedFormula = null;
+  function l1matchSelect(btn) {}
+
+  /* ---- LEVEL 2 TEACH ---- */
+  function goToLevel2teach() {
+    l2Slide = 0; l2TriAnimated = false; l2SinAnimated = false; csAnswers = {};
+    buildL2Progress(); showScreen('level2teach'); updateL2Slide();
+    // reset sin animation
+    ['l2SinV','l2Cable'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('draw'); });
+    ['l2SinRA','l2SinAng','l2SinHL','l2CableL','l2SinBox','l2SinF1','l2SinF2','l2SinCar'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('show'); });
+    const ab = document.getElementById('l2sinAnimBtn'); if(ab) ab.style.display = 'inline-block';
+    // reset mini game
+    [1,2,3].forEach(n => {
+      document.getElementById('l2fb'+n).textContent = '';
+      const card = document.getElementById('l2q'+n);
+      if(card) card.querySelectorAll('.match-btn').forEach(b => { b.className = 'match-btn'; b.disabled = false; });
+    });
+  }
+  function buildL2Progress() {
+    const t = document.getElementById('l2progTrack');
+    t.innerHTML = '';
+    for (let i = 0; i < l2Total; i++) {
+      const d = document.createElement('div'); d.className = 'prog-dot'; t.appendChild(d);
+    }
+    updateL2Progress();
+  }
+  function updateL2Progress() {
+    document.querySelectorAll('#l2progTrack .prog-dot').forEach((d, i) => {
+      d.classList.remove('active','done');
+      if (i < l2Slide) d.classList.add('done');
+      else if (i === l2Slide) d.classList.add('active');
+    });
+  }
+  function updateL2Slide() {
+    document.querySelectorAll('#level2teach .slide').forEach((s, i) => s.classList.toggle('active', i === l2Slide));
+    updateL2Progress();
+    document.getElementById('l2prevBtn').style.display = l2Slide > 0 ? 'inline-block' : 'none';
+    const nb = document.getElementById('l2nextBtn');
+    if (l2Slide === l2Total - 1) {
+      nb.textContent = lang === 'hi' ? 'Quiz खेलो! 📷' : 'Play Quiz! 📷';
+      nb.onclick = () => goToLevel(2);
+    } else {
+      nb.textContent = lang === 'hi' ? 'आगे →' : 'Next →';
+      nb.onclick = l2nextSlide;
+    }
+  }
+  function l2nextSlide() { if (l2Slide < l2Total - 1) { l2Slide++; updateL2Slide(); } }
+  function l2prevSlide() { if (l2Slide > 0) { l2Slide--; updateL2Slide(); } }
+
+  function animL2Sin() {
+    if (l2SinAnimated) return;
+    l2SinAnimated = true;
+    document.getElementById('l2sinAnimBtn').style.display = 'none';
+    setTimeout(() => document.getElementById('l2Cable').classList.add('draw'), 100);
+    setTimeout(() => document.getElementById('l2CableL').classList.add('show'), 900);
+    setTimeout(() => document.getElementById('l2SinV').classList.add('draw'), 1400);
+    setTimeout(() => document.getElementById('l2SinHL').classList.add('show'), 2200);
+    setTimeout(() => { document.getElementById('l2SinRA').classList.add('show'); document.getElementById('l2SinAng').classList.add('show'); }, 2500);
+    setTimeout(() => document.getElementById('l2SinCar').classList.add('show'), 2800);
+    setTimeout(() => { document.getElementById('l2SinBox').classList.add('show'); document.getElementById('l2SinF1').classList.add('show'); document.getElementById('l2SinF2').classList.add('show'); }, 3300);
+  }
+
+  function l2pick(btn, choice, correct, qNum) {
+    const card = document.getElementById('l2q' + qNum);
+    card.querySelectorAll('.match-btn').forEach(b => b.disabled = true);
+    const fb = document.getElementById('l2fb' + qNum);
+    if (correct) {
+      btn.classList.add('matched');
+      const msgs = { en: ['✅ Yes! Height = vertical → Sin!', '✅ Correct! Horizontal distance → Cos!', '✅ Right! Down/up = vertical → Sin!'], hi: ['✅ Sahi! Height = vertical → Sin!', '✅ Sahi! Horizontal distance → Cos!', '✅ Sahi! Upar/neeche = vertical → Sin!'] };
+      fb.innerHTML = `<span style="color:var(--green)">${lang === 'hi' ? msgs.hi[qNum-1] : msgs.en[qNum-1]}</span>`;
+      addXP(3);
+    } else {
+      btn.classList.add('wrong-flash');
+      const msgs = { en: ['❌ Nope — height is vertical, use Sin!', '❌ Not quite — horizontal distance uses Cos!', '❌ Nope — vertical movement (up/down) = Sin!'], hi: ['❌ Nahi — height vertical hai, Sin use karo!', '❌ Nahi — horizontal distance ke liye Cos!', '❌ Nahi — vertical movement ke liye Sin!'] };
+      fb.innerHTML = `<span style="color:#c2185b">${lang === 'hi' ? msgs.hi[qNum-1] : msgs.en[qNum-1]}</span>`;
+      setTimeout(() => btn.classList.remove('wrong-flash'), 700);
+    }
+  }
+
+  function animateL2Triangle() {
+    if (l2TriAnimated) return;
+    l2TriAnimated = true;
+    document.getElementById('l2animBtn').style.display = 'none';
+    const show = (id, delay) => setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.add('draw'); el.classList.add('show'); }
+    }, delay);
+    show('l2triBase', 100); show('l2labelBase', 900);
+    show('l2triHeight', 1200); show('l2labelHeight', 2000);
+    show('l2triHyp', 2200); show('l2labelHyp', 3000);
+    show('l2triRA', 3200); show('l2triTheta', 3400); show('l2triTop', 3400);
+  }
+
+  function updateCosViz(deg) {
+    deg = parseInt(deg);
+    const rad = deg * Math.PI / 180;
+    const hyp = 85, cx = 130, cy = 170;
+    const adj = hyp * Math.cos(rad), opp = hyp * Math.sin(rad);
+    const tipX = cx + adj, tipY = cy - opp;
+    document.getElementById('cosAdj').setAttribute('x1', cx); document.getElementById('cosAdj').setAttribute('y1', cy);
+    document.getElementById('cosAdj').setAttribute('x2', tipX); document.getElementById('cosAdj').setAttribute('y2', cy);
+    document.getElementById('cosOpp').setAttribute('x1', tipX); document.getElementById('cosOpp').setAttribute('y1', cy);
+    document.getElementById('cosOpp').setAttribute('x2', tipX); document.getElementById('cosOpp').setAttribute('y2', tipY);
+    document.getElementById('cosHyp').setAttribute('x1', cx); document.getElementById('cosHyp').setAttribute('y1', cy);
+    document.getElementById('cosHyp').setAttribute('x2', tipX); document.getElementById('cosHyp').setAttribute('y2', tipY);
+    document.getElementById('cosRA').setAttribute('d', `M ${tipX} ${cy-15} L ${tipX-15} ${cy-15} L ${tipX-15} ${cy}`);
+    document.getElementById('cosAngleLabel').setAttribute('x', cx + adj/2);
+    document.getElementById('cosAngleLabel').textContent = deg + '°';
+    ['cosSliderAngle','cosSliderAngle2'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).textContent = deg; });
+    if(document.getElementById('cosSliderSin')) document.getElementById('cosSliderSin').textContent = Math.sin(rad).toFixed(2);
+    if(document.getElementById('cosSliderCos')) document.getElementById('cosSliderCos').textContent = Math.cos(rad).toFixed(2);
+  }
+
+  let csAnswers = {};
+  function csPick(btn, qNum, ans) {
+    if (csAnswers[qNum]) return;
+    csAnswers[qNum] = true;
+    const correct = { 1: 'down', 2: 'yes', 3: '1' };
+    const fb = { 1: { r:'✅ Correct! Bigger angle → less goes forward → Cos shrinks.', w:'❌ Nope. Bigger angle → cable tilts more vertical → Cos decreases.' },
+                 2: { r:'✅ Yes! Cos stays locked, so double cable = double distance.', w:'❌ Actually yes — Cos stays same. Double cable, double distance.' },
+                 3: { r:'✅ Cos 0° = 1! Flat cable → all goes forward.', w:'❌ Cos 0° = 1. Flat cable means all horizontal — nothing wasted going up.' } };
+    const isRight = ans === correct[qNum];
+    btn.style.background = isRight ? '#e8f5e9' : '#ffebee';
+    btn.style.borderColor = isRight ? '#2e7d32' : '#c62828';
+    const el = document.getElementById('csfb' + qNum);
+    el.textContent = isRight ? fb[qNum].r : fb[qNum].w;
+    el.style.color = isRight ? '#2e7d32' : '#c62828';
+    el.style.fontWeight = '500';
+    document.querySelectorAll(`#csq${qNum} .match-btn`).forEach(b => b.disabled = true);
+  }
+
+  /* ---- LEVEL QUIZ ---- */
+  function goToLevel(n) {
+    currentQ = 0; answered = false;
+    const data = n === 1 ? level1 : level2;
+    showScreen('levelScreen');
+    document.getElementById('levelTitle').textContent = n === 1
+      ? (lang === 'hi' ? 'Level 1 — Triangle Gang' : 'Level 1 — The Triangle Gang')
+      : (lang === 'hi' ? 'Level 2 — Zara की Building' : "Level 2 — Zara's Building");
+    // store active level
+    window._activeLevel = n;
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const data = window._activeLevel === 1 ? level1 : level2;
+    const q = data.questions[currentQ];
+    const isHi = lang === 'hi';
+    document.getElementById('levelTitle').textContent = window._activeLevel === 1
+      ? (isHi ? 'Level 1 — Triangle Gang' : 'Level 1 — The Triangle Gang')
+      : (isHi ? 'Level 2 — Zara की Building' : "Level 2 — Zara's Building");
+    document.getElementById('levelSub').textContent = `Question ${currentQ + 1} of ${data.questions.length}`;
+    document.getElementById('levelXP').textContent = `⭐ ${xp} XP`;
+    document.getElementById('qProgressFill').style.width = `${((currentQ + 1) / data.questions.length) * 100}%`;
+    document.getElementById('storyChar').textContent = data.story.char;
+    document.getElementById('storyName').textContent = data.story.name;
+    document.getElementById('storyText').textContent = isHi ? data.story.hi : data.story.en;
+    document.getElementById('qText').textContent = isHi ? q.hi : q.en;
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = '';
+    (isHi ? q.opts.hi : q.opts.en).forEach((o, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = o;
+      btn.onclick = () => selectAnswer(i);
+      grid.appendChild(btn);
+    });
+    document.getElementById('feedbackBox').style.display = 'none';
+    document.getElementById('nextQBtn').style.display = 'none';
+    answered = false;
+  }
+
+  function selectAnswer(idx) {
+    if (answered) return;
+    answered = true;
+    const data = window._activeLevel === 1 ? level1 : level2;
+    const q = data.questions[currentQ];
+    const isHi = lang === 'hi';
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedbackBox');
+    if (idx === q.correct) {
+      btns[idx].classList.add('correct');
+      fb.className = 'feedback-box correct';
+      fb.textContent = isHi ? q.fb.hi : q.fb.en;
+      addXP(10);
+    } else {
+      btns[idx].classList.add('wrong');
+      btns[q.correct].classList.add('correct');
+      fb.className = 'feedback-box wrong';
+      fb.textContent = isHi ? `❌ Galat! Sahi jawab: ${q.opts.hi[q.correct]}` : `❌ Wrong! Correct answer: ${q.opts.en[q.correct]}`;
+    }
+    fb.style.display = 'block';
+    if (currentQ < data.questions.length - 1) {
+      document.getElementById('nextQBtn').style.display = 'inline-block';
+    } else {
+      setTimeout(showCompletion, 1200);
+    }
+  }
+
+  function nextQuestion() { currentQ++; renderQuestion(); }
+
+  function showCompletion() {
+    document.getElementById('completionXP').textContent = `+${xp} XP earned`;
+    const lvl = window._activeLevel;
+    document.getElementById('completionMsg').textContent = lang === 'hi'
+      ? (lvl === 1 ? 'Waah! Sin, Cos aur Tan ke basics master kar liye. Level 2 try karo!' : 'City Explorer ban gaye! Sin aur Cos ka real-world magic samajh aaya!')
+      : (lvl === 1 ? "Sin is yours now. You know how angle controls height. Level 2 unlocked — Zara's City!" : "Cos mastered! Sin goes up, Cos goes forward. Two tools in the bag. Level 3 next!");
+    showScreen('completionScreen');
+  }
+
+  /* ---- XP ---- */
+  function addXP(n) {
+    xp += n; updateXP();
+    const el = document.getElementById('xpGain');
+    el.textContent = `+${n} XP ⭐`;
+    el.style.display = 'block';
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = 'xpFloat 1.5s forwards';
+    setTimeout(() => el.style.display = 'none', 1500);
+  }
+  function updateXP() {
+    document.getElementById('xpDisplay').textContent = `⭐ ${xp} XP`;
+    const lx = document.getElementById('levelXP');
+    if (lx) lx.textContent = `⭐ ${xp} XP`;
+  }
+
+  buildProgress();
+  window._activeLevel = 1;
+</script>
+</body>
+</html>
