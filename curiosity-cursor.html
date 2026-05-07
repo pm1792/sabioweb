@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Curiosity Cursor — Sabio</title>
+<script>
+  if (!localStorage.getItem('sabio_logged_in')) {
+    window.location.href = '/sabio-login.html?next=curiosity-cursor.html';
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --orange: #e85d26;
+  --orange-light: rgba(232,93,38,0.1);
+  --orange-border: rgba(232,93,38,0.25);
+  --dark: #111;
+  --mid: #555;
+  --soft: #999;
+  --bg: #f8f7f4;
+  --white: #fff;
+  --border: rgba(0,0,0,0.09);
+  --radius: 16px;
+  --green: #16a34a;
+  --green-light: rgba(22,163,74,0.1);
+  --blue: #2563eb;
+  --blue-light: rgba(37,99,235,0.1);
+  --purple: #7c3aed;
+  --purple-light: rgba(124,58,237,0.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 5vw;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--dark); text-decoration: none; }
+.logo span { color: var(--orange); }
+
+.xp-bar {
+  display: flex; align-items: center; gap: 10px;
+}
+.xp-badge {
+  background: var(--orange-light);
+  border: 1.5px solid var(--orange-border);
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--orange);
+  display: flex; align-items: center; gap: 5px;
+}
+.xp-level {
+  font-size: 0.72rem;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 3.5rem 5vw 2rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--orange-light);
+  color: var(--orange);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.35rem 1rem; border-radius: 100px;
+  border: 1px solid var(--orange-border);
+  margin-bottom: 1.25rem;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900; line-height: 1.1; letter-spacing: -0.02em;
+  margin-bottom: 0.85rem;
+}
+.hero h1 em { font-style: italic; color: var(--orange); }
+.hero p { color: var(--mid); font-size: 0.95rem; line-height: 1.7; }
+
+/* ── SEARCH ── */
+.search-wrap {
+  max-width: 600px;
+  margin: 1.5rem auto 0;
+  padding: 0 5vw;
+  position: relative;
+}
+.search-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+  color: var(--dark);
+}
+.search-input:focus { border-color: var(--orange); }
+.search-icon {
+  position: absolute; left: calc(5vw + 14px); top: 50%;
+  transform: translateY(-50%);
+  color: var(--soft); font-size: 1rem; pointer-events: none;
+}
+.search-input::placeholder { color: var(--soft); }
+
+/* ── TOPIC GRID ── */
+.topics-section {
+  max-width: 780px;
+  margin: 2rem auto 4rem;
+  padding: 0 5vw;
+}
+.topics-section-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--soft);
+  margin-bottom: 1rem;
+}
+.topics-grid {
+  display: flex; flex-wrap: wrap; gap: 0.6rem;
+}
+.topic-pill {
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.85rem; font-weight: 500;
+  cursor: pointer;
+  background: var(--white);
+  transition: all 0.2s;
+  user-select: none;
+}
+.topic-pill:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-light); }
+.topic-pill.custom-topic { border-style: dashed; border-color: var(--orange-border); color: var(--orange); }
+
+.custom-input-row {
+  display: flex; gap: 0.6rem; margin-top: 1rem;
+}
+.custom-input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+  color: var(--dark);
+}
+.custom-input:focus { border-color: var(--orange); }
+.custom-input::placeholder { color: var(--soft); }
+.btn-add-topic {
+  background: var(--orange);
+  color: white; border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 100px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.btn-add-topic:hover { transform: translateY(-1px); opacity: 0.88; }
+
+/* ── COACHING SCREEN ── */
+#coachScreen { display: none; }
+
+.coach-wrap {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 5vw 4rem;
+}
+.coach-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;
+}
+.coach-topic-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--dark);
+  color: white;
+  font-size: 0.85rem; font-weight: 600;
+  padding: 0.45rem 1rem;
+  border-radius: 100px;
+}
+.btn-change-topic {
+  background: none; border: 1.5px solid var(--border);
+  color: var(--mid); font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem; font-weight: 600;
+  padding: 0.45rem 1rem; border-radius: 100px;
+  cursor: pointer; transition: border-color 0.2s, color 0.2s;
+}
+.btn-change-topic:hover { border-color: var(--dark); color: var(--dark); }
+
+/* Framework card */
+.framework-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-bottom: 1rem;
+  animation: slideUp 0.4s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.framework-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 0.25rem 0.65rem;
+  border-radius: 100px; margin-bottom: 1rem;
+}
+.fw-whatif { background: var(--purple-light); color: var(--purple); }
+.fw-why { background: var(--blue-light); color: var(--blue); }
+.fw-howlike { background: var(--green-light); color: var(--green); }
+.fw-whathappen { background: rgba(234,179,8,0.12); color: #a16207; }
+.fw-whobenefit { background: var(--orange-light); color: var(--orange); }
+
+.framework-question {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; font-weight: 700;
+  line-height: 1.35; margin-bottom: 1.25rem;
+}
+
+.answer-area {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  resize: none; outline: none;
+  transition: border-color 0.2s;
+  color: var(--dark);
+  min-height: 80px;
+  line-height: 1.5;
+}
+.answer-area:focus { border-color: var(--orange); }
+.answer-area::placeholder { color: var(--soft); }
+
+.submit-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 0.85rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.btn-submit {
+  background: var(--orange); color: white; border: none;
+  padding: 0.7rem 1.75rem; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: transform 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 16px rgba(232,93,38,0.3);
+}
+.btn-submit:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.skip-link {
+  font-size: 0.8rem; color: var(--soft); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.skip-link:hover { color: var(--mid); }
+
+/* AI reply bubble */
+.ai-reply {
+  background: var(--dark);
+  color: white;
+  border-radius: var(--radius);
+  border-top-left-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 0.85rem;
+  font-size: 0.88rem; line-height: 1.65;
+  animation: slideUp 0.3s ease;
+  position: relative;
+}
+.ai-reply-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--orange);
+  margin-bottom: 0.5rem;
+}
+.xp-toast {
+  position: absolute; top: -12px; right: 12px;
+  background: var(--orange);
+  color: white; font-size: 0.72rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 100px;
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.5) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Next framework btn */
+.btn-next-fw {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: 1.5px solid var(--border);
+  color: var(--dark); font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  padding: 0.65rem 1.25rem; border-radius: 100px;
+  cursor: pointer; margin-top: 1rem;
+  transition: border-color 0.2s;
+}
+.btn-next-fw:hover { border-color: var(--orange); color: var(--orange); }
+
+/* Curiosity Remix */
+.remix-card {
+  background: linear-gradient(135deg, var(--dark) 0%, #222 100%);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-top: 1.5rem;
+  text-align: center;
+  animation: slideUp 0.4s ease;
+}
+.remix-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700; color: white;
+  margin-bottom: 0.35rem;
+}
+.remix-sub { font-size: 0.78rem; color: #888; margin-bottom: 1.1rem; }
+.remix-pair {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 1rem;
+}
+.remix-concept {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.9rem; font-weight: 600; color: white;
+}
+.remix-x { color: var(--orange); font-size: 1.1rem; font-weight: 700; }
+.btn-remix {
+  background: var(--orange); color: white; border: none;
+  padding: 0.6rem 1.5rem; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: transform 0.15s;
+}
+.btn-remix:hover { transform: translateY(-1px); }
+
+/* ── XP / LEVEL MODAL ── */
+.level-up-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.level-up-overlay.show { display: flex; }
+.level-up-box {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 340px; width: 90%;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.level-up-emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+.level-up-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 900;
+  margin-bottom: 0.4rem;
+}
+.level-up-sub { font-size: 0.88rem; color: var(--mid); margin-bottom: 1.5rem; line-height: 1.5; }
+.btn-level-close {
+  background: var(--orange); color: white; border: none;
+  padding: 0.75rem 2rem; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+}
+
+/* Loading dots */
+.loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+.loading-dots span {
+  width: 5px; height: 5px; background: #888;
+  border-radius: 50%; animation: dotBounce 1s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dotBounce {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .topbar { padding: 0.85rem 4vw; }
+  .hero { padding: 2.5rem 4vw 1.5rem; }
+  .search-wrap { padding: 0 4vw; }
+  .search-icon { left: calc(4vw + 14px); }
+  .topics-section { padding: 0 4vw; }
+  .coach-wrap { padding: 1.5rem 4vw 3rem; }
+  .framework-question { font-size: 1.05rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="logo">sabi<span>o</span></a>
+  <div class="xp-bar">
+    <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    <div class="xp-level" id="levelLabel">Lvl 1 · Spark</div>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="homeScreen">
+  <div class="hero">
+    <div class="hero-badge">🔍 Curiosity Cursor</div>
+    <h1>Get <em>curious</em> about anything</h1>
+    <p>Pick a topic — our AI coaches you to think deeper using proven curiosity frameworks. The more you explore, the more XP you earn.</p>
+  </div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" type="text" placeholder="Search topics…" oninput="filterTopics(this.value)"/>
+  </div>
+
+  <div class="topics-section">
+    <div class="topics-section-title">Browse Topics</div>
+    <div class="topics-grid" id="topicsGrid"></div>
+
+    <div style="margin-top: 1.5rem;">
+      <div class="topics-section-title">Add Your Own Topic</div>
+      <div class="custom-input-row">
+        <input class="custom-input" id="customTopicInput" type="text" placeholder="e.g. Black holes, Negotiation, Cryptocurrency…" maxlength="60"
+          onkeydown="if(event.key==='Enter') addCustomTopic()"/>
+        <button class="btn-add-topic" onclick="addCustomTopic()">+ Add & Explore</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COACHING SCREEN -->
+<div id="coachScreen">
+  <div class="coach-wrap">
+    <div class="coach-header">
+      <div class="coach-topic-tag">🎯 <span id="activeTopic">—</span></div>
+      <button class="btn-change-topic" onclick="goHome()">← Change Topic</button>
+    </div>
+    <div id="frameworkArea"></div>
+    <div id="remixArea"></div>
+  </div>
+</div>
+
+<!-- LEVEL UP MODAL -->
+<div class="level-up-overlay" id="levelModal">
+  <div class="level-up-box">
+    <div class="level-up-emoji" id="levelEmoji">🌟</div>
+    <div class="level-up-title" id="levelTitle">Level Up!</div>
+    <div class="level-up-sub" id="levelSub">You're getting curious. Keep going.</div>
+    <button class="btn-level-close" onclick="closeLevelModal()">Let's go →</button>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SUPABASE_URL = 'https://xmpidahgcsnzgjcmxvyk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtcGlkYWhnY3NuemdjbXh2eWsiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc0MjgxMDY1MCwiZXhwIjoyMDU4Mzg2NjUwfQ.kPJuuFRlLsOdFGjMVCCdwREFEWPH3cJXjZxFB9Gkbgo';
+
+// ── DEFAULT TOPICS ──
+const DEFAULT_TOPICS = [
+  'Artificial Intelligence','Black Holes','Climate Change','Cryptocurrency',
+  'Deep Sea Creatures','Entrepreneurship','Fermentation','Gravity',
+  'Human Psychology','Investing','Japan','Karma',
+  'Language','Memory','Negotiation','Ocean Currents',
+  'Photosynthesis','Quantum Computing','Reading','Sleep',
+  'Time','Urban Planning','Vaccines','Water Scarcity',
+  'X-rays','Yoga','Zero Waste'
+];
+
+let allTopics = [...DEFAULT_TOPICS];
+let filteredTopics = [...allTopics];
+let currentTopic = '';
+let currentFrameworkIndex = 0;
+let currentFrameworks = [];
+let xp = parseInt(localStorage.getItem('sabio_xp') || '0');
+let level = parseInt(localStorage.getItem('sabio_level') || '1');
+
+const LEVELS = [
+  { name: 'Spark',      min: 0,   emoji: '✨', badge: 'Spark',      desc: 'You lit the first flame of curiosity.' },
+  { name: 'Explorer',   min: 50,  emoji: '🧭', badge: 'Explorer',   desc: 'You\'re venturing beyond the obvious.' },
+  { name: 'Thinker',    min: 150, emoji: '🧠', badge: 'Thinker',    desc: 'You question before you accept.' },
+  { name: 'Seeker',     min: 300, emoji: '🔭', badge: 'Seeker',     desc: 'You look deeper than most people dare.' },
+  { name: 'Visionary',  min: 500, emoji: '🌟', badge: 'Visionary',  desc: 'You see connections others miss entirely.' },
+  { name: 'Mastermind', min: 800, emoji: '🏆', badge: 'Mastermind', desc: 'You think at a level most never reach.' },
+];
+
+const FRAMEWORKS = [
+  { id: 'whatif',     label: 'What If?',       class: 'fw-whatif',     emoji: '🌀' },
+  { id: 'why',        label: 'Why?',            class: 'fw-why',        emoji: '🔍' },
+  { id: 'howlike',    label: 'How is it like?', class: 'fw-howlike',    emoji: '🔗' },
+  { id: 'whathappen', label: 'What happens if…',class: 'fw-whathappen', emoji: '⚡' },
+  { id: 'whobenefit', label: 'Who benefits?',   class: 'fw-whobenefit', emoji: '👥' },
+];
+
+const REMIX_CONCEPTS = [
+  'Gravity','Democracy','Fire','Time','Language','Music','Money','Dreams',
+  'Evolution','Memory','Architecture','Food','Sleep','Light','Fear','Justice',
+  'Colour','Silence','Speed','Habit','Culture','Chaos','Trust','Failure'
+];
+
+// ── INIT ──
+async function init() {
+  await loadTopicsFromSupabase();
+  renderTopics(allTopics);
+  updateXPDisplay();
+}
+
+async function loadTopicsFromSupabase() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/curiosity_topics?select=name&order=name.asc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const dbTopics = data.map(r => r.name);
+      const merged = [...new Set([...DEFAULT_TOPICS, ...dbTopics])].sort((a,b) => a.localeCompare(b));
+      allTopics = merged;
+      filteredTopics = [...allTopics];
+    }
+  } catch(e) { /* fallback to defaults */ }
+}
+
+async function saveTopicToSupabase(name) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/curiosity_topics`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'ignore-duplicates'
+      },
+      body: JSON.stringify({ name })
+    });
+  } catch(e) {}
+}
+
+// ── TOPIC RENDER ──
+function renderTopics(topics) {
+  const grid = document.getElementById('topicsGrid');
+  grid.innerHTML = topics.map(t => {
+    const isCustom = !DEFAULT_TOPICS.includes(t);
+    return `<div class="topic-pill${isCustom?' custom-topic':''}" onclick="selectTopic('${t.replace(/'/g,"\\'")}')">
+      ${isCustom ? '✦ ' : ''}${t}
+    </div>`;
+  }).join('');
+}
+
+function filterTopics(q) {
+  const lower = q.toLowerCase().trim();
+  filteredTopics = lower ? allTopics.filter(t => t.toLowerCase().includes(lower)) : [...allTopics];
+  renderTopics(filteredTopics);
+}
+
+// ── ADD CUSTOM TOPIC ──
+function addCustomTopic() {
+  const inp = document.getElementById('customTopicInput');
+  const val = inp.value.trim();
+  if (!val) return;
+  const formatted = val.charAt(0).toUpperCase() + val.slice(1);
+  if (!allTopics.includes(formatted)) {
+    allTopics = [...new Set([...allTopics, formatted])].sort((a,b) => a.localeCompare(b));
+    saveTopicToSupabase(formatted);
+  }
+  inp.value = '';
+  renderTopics(allTopics);
+  selectTopic(formatted);
+}
+
+// ── SELECT TOPIC → COACHING ──
+async function selectTopic(topic) {
+  currentTopic = topic;
+  currentFrameworkIndex = 0;
+  document.getElementById('activeTopic').textContent = topic;
+  document.getElementById('homeScreen').style.display = 'none';
+  document.getElementById('coachScreen').style.display = 'block';
+  document.getElementById('frameworkArea').innerHTML = '';
+  document.getElementById('remixArea').innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Let AI pick best framework order for this topic
+  await loadFrameworks();
+}
+
+async function loadFrameworks() {
+  document.getElementById('frameworkArea').innerHTML = `<div style="text-align:center;padding:2rem;color:var(--soft);font-size:0.88rem;">
+    Picking the best questions for this topic <span class="loading-dots"><span></span><span></span><span></span></span>
+  </div>`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You pick the best curiosity framework order for a given topic and generate a specific question for each. 
+Respond ONLY with valid JSON — no markdown, no explanation.
+Format: [{"id":"whatif","question":"..."}, {"id":"why","question":"..."}, {"id":"howlike","question":"..."}, {"id":"whathappen","question":"..."}, {"id":"whobenefit","question":"..."}]
+Order them so the most engaging/surprising framework comes first for THIS specific topic.
+Questions must be specific to the topic — not generic. Make them thought-provoking and a little unexpected.
+Keep each question under 20 words. Sound like a curious teacher, not a textbook.`,
+        messages: [{ role: 'user', content: `Topic: ${currentTopic}` }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    currentFrameworks = JSON.parse(clean);
+  } catch(e) {
+    // fallback: default order with generic questions
+    currentFrameworks = [
+      { id: 'whatif',     question: `What if ${currentTopic} worked completely differently than it does today?` },
+      { id: 'why',        question: `Why does ${currentTopic} matter more than most people realise?` },
+      { id: 'howlike',    question: `How is ${currentTopic} similar to something totally unrelated?` },
+      { id: 'whathappen', question: `What happens if ${currentTopic} suddenly disappeared from the world?` },
+      { id: 'whobenefit', question: `Who benefits the most from ${currentTopic} — and who doesn't?` },
+    ];
+  }
+
+  renderCurrentFramework();
+}
+
+function renderCurrentFramework() {
+  if (currentFrameworkIndex >= currentFrameworks.length) {
+    showRemix();
+    return;
+  }
+
+  const fw = currentFrameworks[currentFrameworkIndex];
+  const meta = FRAMEWORKS.find(f => f.id === fw.id) || FRAMEWORKS[0];
+
+  const card = document.createElement('div');
+  card.className = 'framework-card';
+  card.id = 'fwCard_' + currentFrameworkIndex;
+  card.innerHTML = `
+    <div class="framework-label ${meta.class}">${meta.emoji} ${meta.label}</div>
+    <div class="framework-question">${fw.question}</div>
+    <textarea class="answer-area" id="answerArea_${currentFrameworkIndex}"
+      placeholder="Type your thoughts… no wrong answers here"
+      rows="3"></textarea>
+    <div class="submit-row">
+      <span class="skip-link" onclick="skipFramework()">Skip this question</span>
+      <button class="btn-submit" id="submitBtn_${currentFrameworkIndex}"
+        onclick="submitAnswer(${currentFrameworkIndex}, '${fw.question.replace(/'/g,"\\'")}', '${meta.id}')">
+        Submit →
+      </button>
+    </div>
+    <div id="aiReply_${currentFrameworkIndex}"></div>
+  `;
+
+  document.getElementById('frameworkArea').innerHTML = '';
+  document.getElementById('frameworkArea').appendChild(card);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function submitAnswer(idx, question, fwId) {
+  const ta = document.getElementById(`answerArea_${idx}`);
+  const answer = ta.value.trim();
+  if (!answer) { ta.style.borderColor = 'var(--orange)'; setTimeout(()=>ta.style.borderColor='',1200); return; }
+
+  const btn = document.getElementById(`submitBtn_${idx}`);
+  btn.disabled = true;
+  btn.textContent = 'Thinking…';
+  ta.disabled = true;
+
+  const replyDiv = document.getElementById(`aiReply_${idx}`);
+  replyDiv.innerHTML = `<div class="ai-reply"><div class="ai-reply-label">Compass says</div><div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+
+  const aiText = await getAIReply(question, answer, fwId);
+
+  replyDiv.innerHTML = `
+    <div class="ai-reply">
+      <div class="xp-toast">+15 XP</div>
+      <div class="ai-reply-label">Compass says</div>
+      <div>${aiText}</div>
+    </div>
+    <button class="btn-next-fw" onclick="nextFramework()">
+      Next question →
+    </button>
+  `;
+
+  addXP(15);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+async function getAIReply(question, answer, fwId) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are a curiosity coach for Indian students. Warm, sharp, never preachy.
+Topic: ${currentTopic}
+Framework used: ${fwId}
+
+Rules:
+- Max 3 short sentences. Never a wall of text.
+- First sentence: affirm something specific from their answer (not generic praise).
+- Second sentence: push their thinking one step further — a surprising angle they didn't consider.
+- Third sentence (optional): a micro-question to keep the spark alive.
+- Hinglish is fine — use it naturally, don't overdo.
+- Never say "Great answer!" or "Excellent!" — be specific.`,
+        messages: [{ role: 'user', content: `Question: ${question}\nStudent's answer: ${answer}` }]
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text || 'Interesting take. There\'s more here to unpack.';
+  } catch(e) {
+    return 'That\'s a real insight. Keep pulling that thread.';
+  }
+}
+
+function skipFramework() {
+  currentFrameworkIndex++;
+  renderCurrentFramework();
+}
+
+function nextFramework() {
+  currentFrameworkIndex++;
+  renderCurrentFramework();
+}
+
+// ── CURIOSITY REMIX ──
+function showRemix() {
+  addXP(25); // bonus for completing all frameworks
+
+  const a = REMIX_CONCEPTS[Math.floor(Math.random() * REMIX_CONCEPTS.length)];
+  let b = currentTopic;
+
+  document.getElementById('remixArea').innerHTML = `
+    <div class="remix-card">
+      <div class="remix-title">🎲 Curiosity Remix</div>
+      <div class="remix-sub">What happens when two ideas collide?</div>
+      <div class="remix-pair">
+        <div class="remix-concept">${currentTopic}</div>
+        <div class="remix-x">×</div>
+        <div class="remix-concept" id="remixB">${a}</div>
+      </div>
+      <div style="color:#888;font-size:0.82rem;margin-bottom:1rem;" id="remixPrompt">
+        How might these two be secretly connected?
+      </div>
+      <button class="btn-remix" onclick="newRemix()">🔀 Remix Again</button>
+    </div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="btn-change-topic" onclick="goHome()" style="font-size:0.9rem;padding:0.7rem 1.5rem;">
+        ← Explore another topic
+      </button>
+    </div>
+  `;
+
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function newRemix() {
+  const concepts = REMIX_CONCEPTS.filter(c => c !== currentTopic);
+  const picked = concepts[Math.floor(Math.random() * concepts.length)];
+  document.getElementById('remixB').textContent = picked;
+  addXP(5);
+}
+
+// ── XP SYSTEM ──
+function addXP(amount) {
+  xp += amount;
+  localStorage.setItem('sabio_xp', xp);
+  updateXPDisplay();
+  checkLevelUp();
+}
+
+function updateXPDisplay() {
+  document.getElementById('xpCount').textContent = xp;
+  const lv = getCurrentLevel();
+  document.getElementById('levelLabel').textContent = `Lvl ${lv.index + 1} · ${lv.name}`;
+}
+
+function getCurrentLevel() {
+  let current = LEVELS[0];
+  let idx = 0;
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) { current = LEVELS[i]; idx = i; break; }
+  }
+  return { ...current, index: idx };
+}
+
+function checkLevelUp() {
+  const lv = getCurrentLevel();
+  if (lv.index + 1 > level) {
+    level = lv.index + 1;
+    localStorage.setItem('sabio_level', level);
+    showLevelUp(lv);
+  }
+}
+
+function showLevelUp(lv) {
+  document.getElementById('levelEmoji').textContent = lv.emoji;
+  document.getElementById('levelTitle').textContent = `Level ${lv.index + 1} — ${lv.name}`;
+  document.getElementById('levelSub').textContent = lv.desc;
+  document.getElementById('levelModal').classList.add('show');
+}
+
+function closeLevelModal() {
+  document.getElementById('levelModal').classList.remove('show');
+}
+
+// ── NAV ──
+function goHome() {
+  document.getElementById('coachScreen').style.display = 'none';
+  document.getElementById('homeScreen').style.display = 'block';
+  document.getElementById('searchInput').value = '';
+  renderTopics(allTopics);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── START ──
+init();
+</script>
+</body>
+</html>
